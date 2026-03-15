@@ -1,9 +1,12 @@
-FROM eclipse-temurin:25-jdk
+FROM eclipse-temurin:25-jdk AS build
 
 WORKDIR /app
+
 COPY build.gradle.kts .
 COPY gradle ./gradle
-RUN cmod -x ./gradlew
+COPY gradlew .
+
+RUN chmod +x ./gradlew
 RUN ./gradlew dependencies --no-daemon || true
 
 COPY src ./src
