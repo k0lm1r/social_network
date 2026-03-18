@@ -1,9 +1,9 @@
-package com.kolmir.social_network.repository;
+package com.kolmir.identity_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kolmir.social_network.model.User;
+import com.kolmir.identity_service.model.User;
 
 
 @Repository

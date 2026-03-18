@@ -1,4 +1,4 @@
-package com.kolmir.social_network.model;
+package com.kolmir.identity_service.model;
 
 public enum UserRole {
     ADMIN,
