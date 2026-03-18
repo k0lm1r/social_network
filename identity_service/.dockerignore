@@ -1,0 +1,10 @@
+.git
+.gitignore
+build
+bin
+.vscode
+*.log
+Dockerfile
+docker-compose.yml
+.env
+application.yml
