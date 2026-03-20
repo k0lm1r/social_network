@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: identity_service
+  liquibase:
+    change-log: classpath:db/migrations/db.changelog-master.yml
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${DATABASE}
+    username: ${USER}
+    password: ${PASSWORD}
