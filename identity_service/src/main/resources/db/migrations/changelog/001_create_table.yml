@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+    id: 1
+    author: Andrey
+    comment: "Table user creating"
+    changes:
+      - createTable:
+        tableName: users
+        remarks: "Table with users profiles"
+        columns:
+          - column:
+            name: id
+            type: BIGINT
+            autoIncremented: true
+            constraints:
+              primaryKey: true
+          - column:
+            name: keycloak_id
+            type: VARCHAR(100)
+            costraints:
+              unique: true
+              nullable: false
+          - column:
+            name: email
+            type: VARCHAR(50)
+            constraints:
+              nullable: false
+              unique: true
+          - column:
+            name: username
+            type: VARCHAR(50)
+            constraints:
+              nullable: false
+              unique: true
+          - column:
+            name: display_name
+            type: VARCHAR(50)
+            constraints:
+              nullable: false
+              unique: true
+          - column:
+            name: bio
+            type: VARCHAR(1000)
+          - column:
+            name: role
+            type: VARCHAR(50)
+            constraints:
+              nullable: false
+          - column:
+            name: registered_at
+            type: TIMESTAMP
+            defaultValueComputed: CURRENT_TIMESTAMP
+            constraints:
+              nullable: false

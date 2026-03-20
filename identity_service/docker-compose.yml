@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
 
-  postgres:
+  identity_db:
     image: postgres:18
     container_name: identity_db
     restart: always
@@ -13,11 +13,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - identity_data:/var/lib/postgresql/data
 
-  backend:
+  identity_backend:
     build: .
-    container_name: spring_backend
+    container_name: identity_backend
     restart: always
     depends_on:
       - postgres
@@ -29,4 +29,4 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${PASSWORD}
 
 volumes:
-  postgres_data:
+  identity_data:

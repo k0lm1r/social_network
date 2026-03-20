@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record UserCreateRequest (
     @Email(message = "{email.invalid}")
+    @Size(min = 1, max = 50, message = "{size}")
     @NotEmpty(message = "{empty}")
     String email,
 
