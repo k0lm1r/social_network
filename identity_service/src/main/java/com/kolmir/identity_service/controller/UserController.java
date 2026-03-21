@@ -16,12 +16,11 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
-
-
 
 
 @RestController
@@ -29,10 +28,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-
     @GetMapping
-    public List<UserResponse> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<UserResponse>> getAll() {
+        return ResponseEntity.ok(userService.getAll());
     }
     
     @GetMapping("/{id}")
@@ -50,6 +48,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
 
-    //TODO: disable impementation
-    
+    @PatchMapping("/disable/{id}")
+    public ResponseEntity<UserResponse> disable(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.disable(id));
+    }
 }

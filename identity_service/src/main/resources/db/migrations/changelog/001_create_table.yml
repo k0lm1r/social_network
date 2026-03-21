@@ -47,6 +47,12 @@ databaseChangeLog:
             constraints:
               nullable: false
           - column:
+            name: is_enabled
+            type: BOOLEAN
+            constraints:
+              nullable: false
+              defaultValueBoolean: true
+          - column:
             name: registered_at
             type: TIMESTAMP
             defaultValueComputed: CURRENT_TIMESTAMP

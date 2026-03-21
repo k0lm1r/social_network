@@ -11,4 +11,5 @@ public interface UserService {
     public UserResponse getById(Long id);
     public UserResponse save(UserCreateRequest request);
     public UserResponse update(Long id, UserUpdateRequest request);
+    public UserResponse disable(Long id);
 }
