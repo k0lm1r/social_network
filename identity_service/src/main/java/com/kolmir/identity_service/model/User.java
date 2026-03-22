@@ -40,6 +40,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Column(name = "is_enabled")
+    private Boolean isEnabled;
+
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
 }

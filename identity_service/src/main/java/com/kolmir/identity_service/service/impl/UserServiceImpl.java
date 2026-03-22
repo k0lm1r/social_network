@@ -26,11 +26,13 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAll() {
         return userMapper.toResponses(userRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getById(Long id) {
         return userMapper.toUserResponse(getUserById(id));
     }
@@ -44,8 +46,14 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(Long id, UserUpdateRequest request) {
         User user = getUserById(id);
         user = UserFieldSetter.setFromUpdateRequest(user, request);
-        userRepository.save(user);
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse disable(Long id) {
+        User user = getUserById(id);
+        user.setIsEnabled(false);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     private User getUserById(Long id) {
@@ -55,4 +63,5 @@ public class UserServiceImpl implements UserService {
                 );
         return user;
     }
+
 }

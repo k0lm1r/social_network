@@ -7,6 +7,7 @@ import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
 import com.kolmir.identity_service.service.UserService;
+import static com.kolmir.identity_service.util.UserConstants.*;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,31 +17,30 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
-
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(USER_MAIN_URL)
 public class UserController {
     private final UserService userService;
-
+    
     @GetMapping
-    public List<UserResponse> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<UserResponse>> getAll() {
+        return ResponseEntity.ok(userService.getAll());
     }
     
-    @GetMapping("/{id}")
+    @GetMapping(USER_ID_URL)
     public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
     
-    @PutMapping("/{id}")
+    @PutMapping(USER_ID_URL)
     public ResponseEntity<UserResponse> updateById(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
         return ResponseEntity.ok(userService.update(id, request));
     }
@@ -50,6 +50,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
 
-    //TODO: disable impementation
-    
+    @PatchMapping(USER_DISABLE_URL)
+    public ResponseEntity<UserResponse> disable(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.disable(id));
+    }
 }
