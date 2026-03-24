@@ -16,9 +16,6 @@ allprojects {
 val mapstructVersion = "1.6.3"
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "org.springframework.boot")
 
     java {
         toolchain {
@@ -32,26 +29,31 @@ subprojects {
         }
     }
 
-    dependencies {
-        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-        implementation("org.springframework.boot:spring-boot-starter-security")
-        implementation("org.springframework.boot:spring-boot-starter-webmvc")
-        implementation("org.mapstruct:mapstruct:$mapstructVersion")
-        implementation("org.liquibase:liquibase-core")
+    if (name != "proto") {
+        apply(plugin = "java")
+        apply(plugin = "io.spring.dependency-management")
 
-        compileOnly("org.projectlombok:lombok")
-        runtimeOnly("org.postgresql:postgresql")
-        annotationProcessor("org.projectlombok:lombok")
-        annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
-        annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-        
-        testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-        testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
-        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    }
+        dependencies {
+            implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+            implementation("org.springframework.boot:spring-boot-starter-security")
+            implementation("org.springframework.boot:spring-boot-starter-webmvc")
+            implementation("org.mapstruct:mapstruct:$mapstructVersion")
+            implementation("org.liquibase:liquibase-core")
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
+            compileOnly("org.projectlombok:lombok")
+            runtimeOnly("org.postgresql:postgresql")
+            annotationProcessor("org.projectlombok:lombok")
+            annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+            annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+            
+            testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+            testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+            testImplementation("org.springframework.boot:spring-boot-starter-test")
+            testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        }
+
+        tasks.withType<Test> {
+            useJUnitPlatform()
+        }
     }
 }
