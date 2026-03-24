@@ -1,5 +1,7 @@
 plugins {
-    id("java")
+    java
+    id("com.google.protobuf") version "0.9.4" apply false
+    id("io.freefair.lombok") version "9.2.0" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("org.springframework.boot") version "4.0.4" apply false
 }
@@ -15,14 +17,8 @@ allprojects {
 
 val mapstructVersion = "1.6.3"
 
+
 subprojects {
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(25))
-        }
-    }
-
     configurations {
         compileOnly {
             extendsFrom(configurations.annotationProcessor.get())
@@ -32,6 +28,13 @@ subprojects {
     if (name != "proto") {
         apply(plugin = "java")
         apply(plugin = "io.spring.dependency-management")
+        apply(plugin = "org.springframework.boot")
+
+        extensions.configure<JavaPluginExtension> {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(25))
+            }
+        }
 
         dependencies {
             implementation("org.springframework.boot:spring-boot-starter-data-jpa")

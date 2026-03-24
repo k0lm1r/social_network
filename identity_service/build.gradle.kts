@@ -1,3 +1,8 @@
+plugins {
+	application
+	id("io.freefair.lombok")
+}
+
 description = "Identity service for social network"
 
 dependencies {
