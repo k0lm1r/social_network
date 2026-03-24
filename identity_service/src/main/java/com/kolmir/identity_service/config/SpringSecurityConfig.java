@@ -43,6 +43,8 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
+
+    //TODO вынести в отдельный класс
     @Bean
     Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
         return jwt -> {
