@@ -14,6 +14,7 @@ import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserService;
 import com.kolmir.identity_service.service.impl.util.UserFieldSetter;
+import static com.kolmir.identity_service.util.UserConstants.USER_ID_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
     private User getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(
-                    () -> new NotFoundException("User with this id was not found")
+                    () -> new NotFoundException(USER_ID_NOT_FOUND)
                 );
         return user;
     }

@@ -6,5 +6,6 @@ import lombok.experimental.UtilityClass;
 public class UserConstants {
     public final String USER_MAIN_URL = "/api/users";
     public final String USER_ID_URL = "/{id}";
-    public final String USER_DISABLE_URL = "/disable" + USER_ID_URL;  
+    public final String USER_DISABLE_URL = "/disable" + USER_ID_URL;
+    public final String USER_ID_NOT_FOUND = "User with this id was not found";
 }
