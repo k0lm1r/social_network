@@ -1,1 +1,2 @@
-CREATE DATABASE IF NOT EXISTS db;
+CREATE DATABASE keycloak_db;
+CREATE DATABASE modsen_social_db;

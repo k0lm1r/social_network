@@ -13,6 +13,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew :identity_service:dependencies --no-daemon || true
 
 COPY identity_service identity_service
+COPY proto proto
 
 RUN ./gradlew :identity_service:bootJar --no-daemon
 
