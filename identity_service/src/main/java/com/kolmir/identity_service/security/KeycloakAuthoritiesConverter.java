@@ -10,12 +10,13 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Component;
 
 
+@Component
 public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    //TODO вставить в файл
-    @Value("${keycloak-clientid}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.clientid}")
     private String clientId;
     
     @Override

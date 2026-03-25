@@ -10,12 +10,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Configuration
 public class JwtConfig {
-    //TODO исправить файл
     
-    @Value("${issuer-url}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Value("${jwks-uri}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwks-uri}")
     private String jwksUri;
 
     @Bean

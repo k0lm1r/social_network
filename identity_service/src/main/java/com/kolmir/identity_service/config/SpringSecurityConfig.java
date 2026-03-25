@@ -20,8 +20,8 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("api/users/{id}").permitAll()
-                .requestMatchers("api/users/disable").hasRole("ADMIN")
+                .requestMatchers("/api/users/{id}").permitAll()
+                .requestMatchers("/api/users/disable").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(
@@ -34,7 +34,8 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
-    private Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
+    @Bean
+    Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
         var converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(new KeycloakAuthoritiesConverter());
         return converter;
