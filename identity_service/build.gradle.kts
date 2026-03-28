@@ -14,7 +14,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.liquibase:liquibase-core")
+    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("org.keycloak:keycloak-admin-client:26.0.8")
 
     runtimeOnly("org.postgresql:postgresql")
 

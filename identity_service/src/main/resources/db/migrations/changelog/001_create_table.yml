@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 1
       author: Andrey
-      comment: "Table user creating"
+      comment: "Table users creating"
       changes:
         - createTable:
             tableName: users

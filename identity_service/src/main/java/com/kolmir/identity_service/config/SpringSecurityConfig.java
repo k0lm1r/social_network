@@ -1,6 +1,9 @@
 package com.kolmir.identity_service.config;
 
+import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.security.KeycloakAuthoritiesConverter;
+import static com.kolmir.identity_service.util.UserConstants.*;
+import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +23,8 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/{id}").permitAll()
-                .requestMatchers("/api/users/disable").hasRole("ADMIN")
+                .requestMatchers(USER_MAIN_URL).permitAll()
+                .requestMatchers(USER_DISABLE_URL).hasRole(UserRole.ADMIN.getStringName())
                 .anyRequest().authenticated()
             )
             .sessionManagement(
@@ -37,6 +40,7 @@ public class SpringSecurityConfig {
     @Bean
     Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
         var converter = new JwtAuthenticationConverter();
+        converter.setPrincipalClaimName(CLAIM_NAME);
         converter.setJwtGrantedAuthoritiesConverter(new KeycloakAuthoritiesConverter());
         return converter;
     }

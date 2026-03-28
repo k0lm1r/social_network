@@ -15,6 +15,10 @@ public record UserCreateRequest (
     String username,
 
     @NotBlank(message = "{blank}")
+    @Size(min = 4, message = "{size}")
+    String password,
+
+    @NotBlank(message = "{blank}")
     @Size(min = 1, max = 50, message = "{size}")
     String displayName,
 
