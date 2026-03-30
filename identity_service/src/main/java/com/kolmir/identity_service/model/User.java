@@ -10,15 +10,18 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+
 @Entity
 @ToString
 @Getter @Setter
 @EqualsAndHashCode
+@Table(name = "users")
 public class User {
     @Id
     @EqualsAndHashCode.Exclude

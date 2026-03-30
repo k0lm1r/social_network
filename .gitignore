@@ -3,7 +3,7 @@ HELP.md
 build/
 !gradle/wrapper/gradle-wrapper.jar
 .gradle-home
-
+app-logs
 .vscode/
 .env
 bin

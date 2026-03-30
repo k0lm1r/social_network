@@ -32,7 +32,7 @@ public class UserAuthProviderImpl implements UserAuthProvider {
     private final Keycloak keycloak;
 
     @Value("${keycloak.realm}")
-    private final String realm;
+    private String realm;
 
     @Override
     public String createUser(UserCreateRequest request) {

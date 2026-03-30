@@ -33,5 +33,6 @@ public interface UserMapper {
     @AfterMapping
     public default void setRegistrationTime(UserCreateRequest request, @MappingTarget User user) {
         user.setRegisteredAt(LocalDateTime.now());
+        user.setIsEnabled(true);
     }
 }

@@ -35,14 +35,14 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole(UserRole.ADMIN.getStringName())")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAll() {
         return userMapper.toResponses(userRepository.findAll());
     }
     
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole(UserRole.ADMIN.getStringName())")
+    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse getById(Long id) {
         return userMapper.toUserResponse(getUserById(id));
     }
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole(UserRole.ADMIN.getStringName())")
+    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse update(Long id, UserUpdateRequest request) {
         User user = getUserById(id);
         user = UserFieldSetter.setFromUpdateRequest(user, request);
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole(UserRole.ADMIN.getStringName())")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse disable(Long id) {
         User user = getUserById(id);
         user.setIsEnabled(false);

@@ -15,7 +15,7 @@ public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<G
         var realmRoles = jwt.getClaimAsStringList(ROLES_LIST_NAME);
 
         return realmRoles.stream()
-                .filter(role -> role.startsWith("ROLE_"))
+                .map(role -> "ROLE_" + role)
                 .map(SimpleGrantedAuthority::new)
                 .map(GrantedAuthority.class::cast)
                 .toList();
