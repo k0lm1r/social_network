@@ -1,22 +1,16 @@
-FROM eclipse-temurin:25-jdk AS build
-
+FROM gradle:9.3.1-jdk25 AS build
 WORKDIR /app
 
-COPY gradlew .
-COPY gradle gradle
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY identity_service/build.gradle.kts identity_service/build.gradle.kts
-# COPY proto/build.gradle.kts proto/build.gradle.kts
 
-RUN chmod +x ./gradlew
-
-RUN ./gradlew :identity_service:dependencies --no-daemon || true
+RUN gradle :identity_service:dependencies --no-daemon || true
 
 COPY identity_service identity_service
 COPY proto proto
 
-RUN ./gradlew :identity_service:bootJar --no-daemon
+RUN gradle :identity_service:bootJar --no-daemon
 
 FROM eclipse-temurin:25-jre
 

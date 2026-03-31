@@ -10,6 +10,6 @@ import com.kolmir.identity_service.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    public boolean existsByIdAndKeycloakId(Long id, UUID keycloakId);
+    public boolean existsByIdAndKeycloakId(Long id, String keycloakId);
     public boolean existsByKeycloakId(UUID keycloakId);
 }

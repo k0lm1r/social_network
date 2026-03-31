@@ -13,5 +13,4 @@ public interface UserService {
     public UserResponse save(UserCreateRequest request);
     public UserResponse update(Long id, UserUpdateRequest request);
     public UserResponse disable(Long id);
-    public boolean isCurrentUserOwner(Long id);
 }

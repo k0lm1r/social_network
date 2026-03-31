@@ -1,8 +1,6 @@
 package com.kolmir.identity_service.service.impl;
 
 import java.util.List;
-import java.util.UUID;
-
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -66,7 +64,7 @@ public class UserAuthProviderImpl implements UserAuthProvider {
     }
 
     @Override
-    public void disableUser(UUID userId) {
+    public void disableUser(String userId) {
         UserResource userResource = keycloak.realm(realm).users()
                                     .get(userId.toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();

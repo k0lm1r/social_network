@@ -6,6 +6,7 @@ public record UserResponse(
     String email,
     String username,
     String displayName,
-    String bio
+    String bio,
+    Boolean isEnabled
 ) {
 }

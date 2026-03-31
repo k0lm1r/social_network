@@ -1,8 +1,6 @@
 package com.kolmir.identity_service.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,7 +28,7 @@ public class User {
 
     @EqualsAndHashCode.Exclude
     @Column(name = "keycloak_id")
-    private UUID keycloakId;
+    private String keycloakId;
 
     private String email;
     private String username;

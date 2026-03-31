@@ -29,7 +29,7 @@ public class KeycloakAdminConfig {
     private String password;
 
     @Bean
-    Keycloak keycloak() {
+    public Keycloak keycloak() {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)

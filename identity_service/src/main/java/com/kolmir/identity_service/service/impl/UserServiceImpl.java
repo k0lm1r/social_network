@@ -1,11 +1,7 @@
 package com.kolmir.identity_service.service.impl;
 
 import java.util.List;
-import java.util.UUID;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +38,7 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole('ADMIN')")
+    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse getById(Long id) {
         return userMapper.toUserResponse(getUserById(id));
     }
@@ -52,14 +48,14 @@ public class UserServiceImpl implements UserService {
         String keycloakId = userAuthProvider.createUser(request);
         if (!keycloakId.isEmpty()) {
             User user = userMapper.toUser(request);
-            user.setKeycloakId(UUID.fromString(keycloakId));
+            user.setKeycloakId(keycloakId);
             return userMapper.toUserResponse(userRepository.save(user));
         }
         return null;
     }
 
     @Override
-    @PreAuthorize("@userService.isCurrentUserOwner(#id) || hasRole('ADMIN')")
+    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse update(Long id, UserUpdateRequest request) {
         User user = getUserById(id);
         user = UserFieldSetter.setFromUpdateRequest(user, request);
@@ -83,14 +79,4 @@ public class UserServiceImpl implements UserService {
                 );
         return user;
     }
-
-    public boolean isCurrentUserOwner(Long id) {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        String keycloakId = jwt.getSubject();
-        return userRepository.existsByIdAndKeycloakId(id, UUID.fromString(keycloakId));
-    }
-
 }

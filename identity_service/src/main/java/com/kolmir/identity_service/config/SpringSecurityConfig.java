@@ -19,7 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SpringSecurityConfig {
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
@@ -38,7 +38,7 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
+    public Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
         var converter = new JwtAuthenticationConverter();
         converter.setPrincipalClaimName(CLAIM_NAME);
         converter.setJwtGrantedAuthoritiesConverter(new KeycloakAuthoritiesConverter());
