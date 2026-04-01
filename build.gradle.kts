@@ -2,7 +2,7 @@ plugins {
     java
     id("com.google.protobuf") version "0.9.4" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
-    id("org.springframework.boot") version "4.0.4" apply false
+    id("org.springframework.boot") version "4.0.5" apply false
     id("io.freefair.lombok") version "9.2.0" apply false
 }
 
@@ -38,8 +38,7 @@ subprojects {
         }
 
         dependencies {
-            implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-            implementation("org.springframework.boot:spring-boot-starter-webmvc")
+            implementation("org.springframework.boot:spring-boot-starter-web")
             implementation("org.springframework.boot:spring-boot-starter-validation")
             implementation("org.mapstruct:mapstruct:$mapstructVersion")
 

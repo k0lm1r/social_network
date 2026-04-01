@@ -3,7 +3,9 @@ plugins {
 }
 
 rootProject.name = "social-network"
+
 include(
     "identity_service",
-    "proto"
+    "proto",
+    "eureka_server"
 )
