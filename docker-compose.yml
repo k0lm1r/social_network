@@ -48,7 +48,15 @@ services:
       DB_PORT: 5432
     volumes:
       - ./app-logs:/app/logs
-      
+  
+  eureka_server:
+    build:
+      context: .
+      dockerfile: ./eureka_server/Dockerfile
+    container_name: eureka_server
+    ports:
+      - "8083:8083"
+  
 volumes:
   postgres_data:
   app-logs:
