@@ -2,6 +2,7 @@ package com.kolmir.identity_service.util;
 
 import lombok.experimental.UtilityClass;
 
+
 @UtilityClass
 public class KeycloakConstants {
     public final String ROLES_LIST_NAME = "spring_roles";

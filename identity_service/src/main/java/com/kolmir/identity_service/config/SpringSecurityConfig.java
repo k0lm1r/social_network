@@ -3,6 +3,7 @@ package com.kolmir.identity_service.config;
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.security.KeycloakAuthoritiesConverter;
 import static com.kolmir.identity_service.util.UserConstants.*;
+import static com.kolmir.identity_service.util.AuthConstants.AUTH_PATH;
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
 import org.springframework.context.annotation.Bean;
@@ -23,8 +24,8 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(USER_MAIN_URL).permitAll()
-                .requestMatchers(USER_DISABLE_URL).hasRole(UserRole.ADMIN.getStringName())
+                .requestMatchers(AUTH_PATH + "/**").permitAll()
+                .requestMatchers(USER_DISABLE_URL, USER_MAIN_URL).hasRole(UserRole.ADMIN.getStringName())
                 .anyRequest().authenticated()
             )
             .sessionManagement(
