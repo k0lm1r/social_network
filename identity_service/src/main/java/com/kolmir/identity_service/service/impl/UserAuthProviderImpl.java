@@ -1,6 +1,8 @@
 package com.kolmir.identity_service.service.impl;
 
 import java.util.List;
+import java.util.Map;
+
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -8,8 +10,17 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
@@ -26,17 +37,26 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserAuthProviderImpl implements UserAuthProvider {
+    @Value("${keycloak.server-url}") 
+    public String serverUrl;
+
+    @Value("${keycloak.realm}") 
+    public String realm;
+
+    @Value("${keycloak.client-id}")
+    public String clientId;
+
+    @Value("${keycloak.client-secret}")
+    public String clientSecret;
 
     private final Keycloak keycloak;
-
-    @Value("${keycloak.realm}")
-    private String realm;
-
+    private final RestTemplate restTemplate = new RestTemplate();
+    
     @Override
     public String createUser(UserCreateRequest request) {
         UserRepresentation user = getRepresentation(request);
         UsersResource usersResourse = keycloak.realm(realm).users();
-
+        
         try (Response response = usersResourse.create(user)) {
             if (response.getStatus() == HttpStatus.CREATED.value()) {
                 String location = response.getHeaderString(LOCATION_HEADER_NAME);
@@ -46,62 +66,114 @@ public class UserAuthProviderImpl implements UserAuthProvider {
             }
             if (response.getStatus() == HttpStatus.CONFLICT.value())
                 throw new AlreadyExistsException(USER_ALREADY_EXISTS_MESSAGE);
-
+            
             throw new CreatingException(String.format(USER_CREATING_EXCEPTION_TEMPLATE, response.getStatus()));
         }
     }
-
+    
     @Override
     public void changeUserInfo(User user) {
         UserResource userResource = keycloak.realm(realm).users()
-                                    .get(user.getKeycloakId().toString());
+        .get(user.getKeycloakId().toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();
-
+        
         userRepresentation.setUsername(user.getUsername());
         userRepresentation.setEmail(user.getEmail());
-
+        
         userResource.update(userRepresentation);
     }
-
+    
     @Override
     public void disableUser(String userId) {
         UserResource userResource = keycloak.realm(realm).users()
-                                    .get(userId.toString());
+        .get(userId.toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();
-
+        
         userRepresentation.setEnabled(false);
         userResource.update(userRepresentation);
     }
-
+    
+    @Override
+    public Map<String, Object> getTokensForUser(String username, String password) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "password");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("username", username);
+        body.add("password", password);
+        
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+            getTokenUrl(),
+            HttpMethod.POST,
+            request,
+            new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+        
+        return response.getBody();
+    }
+    
+    @Override
+    public Map<String, Object> refreshUserToken(String refreshToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("refresh_token", refreshToken);
+        
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+            getTokenUrl(),
+            HttpMethod.POST,
+            request,
+            new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+        
+        return response.getBody();
+    }
+    
     private UserRepresentation getRepresentation(UserCreateRequest request) {
         UserRepresentation user = new UserRepresentation();
-
+        
         user.setEnabled(true);
         user.setUsername(request.username());
         user.setEmail(request.email());
         user.setEmailVerified(true);
-
+        
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setValue(request.password());
         credential.setTemporary(false);
-
+        
         user.setCredentials(List.of(credential));
-
+        
         return user;
     }
-
+    
     private void setUserRole(String userId, String role) {
         RoleRepresentation roleRepresentation = keycloak.realm(realm)
                                                 .roles()
                                                 .get(role)
                                                 .toRepresentation();
-
+                                                
         keycloak.realm(realm)
-        .users()
-        .get(userId)
-        .roles()
-        .realmLevel()
-        .add(List.of(roleRepresentation));
+            .users()
+            .get(userId)
+            .roles()
+            .realmLevel()
+            .add(List.of(roleRepresentation));
+    }
+        
+    private String getTokenUrl() {
+        return String.format("%s/realms/%s/protocol/openid-connect/token", serverUrl, realm);
     }
 }
+                                        
