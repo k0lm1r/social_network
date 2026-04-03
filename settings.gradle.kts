@@ -4,8 +4,11 @@ plugins {
 
 rootProject.name = "social-network"
 
-include(
-    "identity_service",
-    "proto",
-    "eureka_server"
-)
+val modules = listOf("identity_service",
+                    "proto",
+                    "eureka_server",
+                    "api_gateway")
+
+modules
+    .filter { file(it).isDirectory }
+    .forEach { include(":$it") }

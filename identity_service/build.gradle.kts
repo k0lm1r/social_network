@@ -4,10 +4,6 @@ plugins {
 
 description = "Identity service for social network"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -15,7 +11,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.keycloak:keycloak-admin-client:26.0.8")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-aop:7.0.6")
 
     runtimeOnly("org.postgresql:postgresql")

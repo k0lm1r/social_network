@@ -36,6 +36,7 @@ services:
     depends_on:
       - db
       - keycloak
+      - eureka
     ports:
       - "8082:8082"
     env_file:
@@ -46,13 +47,13 @@ services:
     volumes:
       - ./app-logs:/app/logs
   
-  eureka_server:
+  eureka:
     build:
       context: .
       dockerfile: ./eureka_server/Dockerfile
-    container_name: eureka_server
+    container_name: eureka
     ports:
-      - "8888:8888"
+      - "8761:8761"
   
 volumes:
   postgres_data:

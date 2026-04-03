@@ -51,11 +51,13 @@ subprojects {
         dependencies {
             implementation("org.springframework.boot:spring-boot-starter-web")
             implementation("org.springframework.boot:spring-boot-starter-validation")
+            implementation("org.springframework.boot:spring-boot-starter-actuator")
 
             implementation("org.mapstruct:mapstruct:$mapstructVersion")
             annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
             annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
+	        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
             testImplementation("org.springframework.boot:spring-boot-starter-test")
         }
 
