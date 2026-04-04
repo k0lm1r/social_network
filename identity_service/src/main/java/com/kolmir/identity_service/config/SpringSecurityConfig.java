@@ -37,7 +37,7 @@ public class SpringSecurityConfig {
             
         return http.build();
     }
-
+    //вынести логику в конвертер
     @Bean
     public Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
         var converter = new JwtAuthenticationConverter();

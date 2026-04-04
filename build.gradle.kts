@@ -18,6 +18,7 @@ allprojects {
 }
 
 extra["springCloudVersion"] = "2025.1.1"
+extra["springGrpcVersion"] = "1.0.2"
 
 
 subprojects {
@@ -40,6 +41,10 @@ subprojects {
                     "org.springframework.cloud:spring-cloud-dependencies:${rootProject.extra["springCloudVersion"]}"
                 )
             }
+
+            imports {
+                mavenBom("org.springframework.grpc:spring-grpc-dependencies:${property("springGrpcVersion")}")
+            }
         }
 
         configurations {
@@ -49,7 +54,6 @@ subprojects {
         }
 
         dependencies {
-            implementation("org.springframework.boot:spring-boot-starter-web")
             implementation("org.springframework.boot:spring-boot-starter-validation")
             implementation("org.springframework.boot:spring-boot-starter-actuator")
 

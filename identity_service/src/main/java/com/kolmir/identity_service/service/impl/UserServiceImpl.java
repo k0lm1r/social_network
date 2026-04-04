@@ -1,7 +1,6 @@
 package com.kolmir.identity_service.service.impl;
 
 import java.util.List;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,7 @@ import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.service.UserService;
 import com.kolmir.identity_service.service.impl.util.UserFieldSetter;
-import com.kolmir.identity_service.util.UserConstants;
+import static com.kolmir.identity_service.util.UserConstants.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,14 +30,12 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAll() {
         return userMapper.toResponses(userRepository.findAll());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse getById(Long id) {
         return userMapper.toUserResponse(getUserById(id));
     }
@@ -55,7 +52,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public UserResponse update(Long id, UserUpdateRequest request) {
         User user = getUserById(id);
         user = UserFieldSetter.setFromUpdateRequest(user, request);
@@ -64,7 +60,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse disable(Long id) {
         User user = getUserById(id);
         user.setIsEnabled(false);
@@ -75,7 +70,7 @@ public class UserServiceImpl implements UserService {
     private User getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(
-                    () -> new NotFoundException(UserConstants.USER_ID_NOT_FOUND)
+                    () -> new NotFoundException(USER_ID_NOT_FOUND)
                 );
         return user;
     }

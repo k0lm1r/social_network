@@ -1,7 +1,7 @@
 package com.kolmir.identity_service.dto;
 
 
-public record UserAuthRequest(
+public record UserAuthRequest (
     String username,
     String password
 ) {}

@@ -8,18 +8,18 @@ spring:
   application:
     name: identity_service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB:modsen_social_db}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URL}
-          jwks-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:9090}/realms/modsen-social/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8888/realms/modsen-social}
+          jwks-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8888}/realms/modsen-social/protocol/openid-connect/certs
 
 keycloak:
-  server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:9090}
+  server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8888}
   realm: modsen-social
   client-id: api-gateway
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
@@ -31,7 +31,7 @@ eureka:
     healthcheck:
       enabled: true
     service-url:
-      defaultZone: ${EUREKA_URL}
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
 
 server:
   port: 8082

@@ -1,10 +1,10 @@
 HELP.md
-.gradle
+.gradle*
 build/
 !gradle/wrapper/gradle-wrapper.jar
-.gradle-home
-.gradle-proj
+
 app-logs
 .vscode/
 .env
+dev.env
 bin

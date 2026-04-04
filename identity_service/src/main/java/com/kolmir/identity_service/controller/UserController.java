@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,16 +32,19 @@ public class UserController {
     private final UserService userService;
     
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
     
     @GetMapping(USER_ID_URL)
+    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
     
     @PutMapping(USER_ID_URL)
+    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updateById(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
         return ResponseEntity.ok(userService.update(id, request));
     }
@@ -51,6 +55,7 @@ public class UserController {
     }
 
     @PatchMapping(USER_DISABLE_URL)
+    @PreAuthorize("!@securityServiceImpl.securityService.isCurrentUserOwner(id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> disable(@PathVariable Long id) {
         return ResponseEntity.ok(userService.disable(id));
     }
