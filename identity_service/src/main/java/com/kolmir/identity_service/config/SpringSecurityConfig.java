@@ -4,16 +4,10 @@ import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.security.KeycloakAuthoritiesConverter;
 import static com.kolmir.identity_service.util.UserConstants.*;
 import static com.kolmir.identity_service.util.AuthConstants.AUTH_PATH;
-import static com.kolmir.identity_service.util.KeycloakConstants.*;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -32,17 +26,9 @@ public class SpringSecurityConfig {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakAuthConverter()))
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(new KeycloakAuthoritiesConverter()))
             );
             
         return http.build();
-    }
-    //вынести логику в конвертер
-    @Bean
-    public Converter<Jwt, ? extends AbstractAuthenticationToken> keycloakAuthConverter() {
-        var converter = new JwtAuthenticationConverter();
-        converter.setPrincipalClaimName(CLAIM_NAME);
-        converter.setJwtGrantedAuthoritiesConverter(new KeycloakAuthoritiesConverter());
-        return converter;
     }
 }

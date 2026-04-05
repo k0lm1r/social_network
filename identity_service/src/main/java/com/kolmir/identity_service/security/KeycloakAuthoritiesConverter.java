@@ -1,17 +1,20 @@
 package com.kolmir.identity_service.security;
 
 import java.util.Collection;
+
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
 
-public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+public class KeycloakAuthoritiesConverter implements Converter<Jwt, AbstractAuthenticationToken> {
     
-    @Override
-    public Collection<GrantedAuthority> convert(Jwt jwt) {
+    public Collection<GrantedAuthority> getAuthorities(Jwt jwt) {
         var realmRoles = jwt.getClaimAsStringList(ROLES_LIST_NAME);
 
         return realmRoles.stream()
@@ -20,4 +23,12 @@ public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<G
                 .map(GrantedAuthority.class::cast)
                 .toList();
     }
+
+    @Override
+    public AbstractAuthenticationToken convert(Jwt jwt) {
+        String principalName = jwt.getClaimAsString(CLAIM_NAME);
+        return new JwtAuthenticationToken(jwt, getAuthorities(jwt), principalName);
+    }
+
+    
 }
