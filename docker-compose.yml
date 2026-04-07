@@ -36,11 +36,11 @@ services:
     ports:
       - "8888:8080"
 
-  identity_backend:
+  identity-service:
     build:
       context: .
       dockerfile: ./identity_service/Dockerfile
-    container_name: identity_backend
+    container_name: identity-service
     depends_on:
       db:
         condition: service_healthy
@@ -74,7 +74,7 @@ services:
     depends_on:
       eureka:
         condition: service_started
-      identity_backend:
+      identity-service:
         condition: service_started
     ports:
       - "8080:8081"

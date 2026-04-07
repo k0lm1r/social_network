@@ -3,8 +3,9 @@ HELP.md
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-app-logs
+app-logs/
 .vscode/
 .env
 dev.env
 bin
+*/logs/

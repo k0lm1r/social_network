@@ -23,6 +23,7 @@ import com.kolmir.identity_service.model.UserRole;
 )
 public interface UserMapper {
     public UserResponse toUserResponse(User user);
+    public com.kolmir.validate_token.UserResponse toGrpcUserResponse(UserResponse user);
     public User toUser(UserUpdateRequest request);
 
     @Mapping(target = "role", constant = "USER")

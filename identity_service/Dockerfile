@@ -4,6 +4,7 @@ WORKDIR /app
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY identity_service/build.gradle.kts identity_service/build.gradle.kts
+COPY proto/build.gradle.kts proto/build.gradle.kts
 
 RUN gradle :identity_service:dependencies --no-daemon || true
 

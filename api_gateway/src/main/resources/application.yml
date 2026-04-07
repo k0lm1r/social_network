@@ -1,6 +1,10 @@
 spring:
   application:
-    name: api_gateway
+    name: api-gateway
+  grpc:
+    client:
+      default-channel:
+        address: static://${IDENTITY_CONTAINER_NAME:localhost}:9090
   cloud:
     gateway:
       server:
@@ -9,6 +13,7 @@ spring:
             locator:
               enabled: true
               lower-case-service-id: true
+      
 
 server:
   port: 8081

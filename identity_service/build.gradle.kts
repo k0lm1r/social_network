@@ -13,7 +13,7 @@ dependencies {
     implementation("org.keycloak:keycloak-admin-client:26.0.8")
     implementation("org.springframework:spring-aop:7.0.6")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE")
+    implementation(project(":proto"))
     implementation("io.grpc:grpc-services")
 	implementation("org.springframework.grpc:spring-grpc-server-spring-boot-starter")
     runtimeOnly("org.postgresql:postgresql")
