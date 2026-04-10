@@ -18,7 +18,13 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(AUTH_PATH + "/**", "/actuator/**").permitAll()
+                .requestMatchers(
+                    AUTH_PATH + "/**",
+                    "/actuator/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
                 .requestMatchers(USER_DISABLE_URL, USER_MAIN_URL).hasRole(UserRole.ADMIN.getStringName())
                 .anyRequest().authenticated()
             )

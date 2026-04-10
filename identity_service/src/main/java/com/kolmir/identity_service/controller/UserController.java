@@ -3,6 +3,7 @@ package com.kolmir.identity_service.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kolmir.identity_service.controller.api.UserControllerApi;
 import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
@@ -28,32 +29,37 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(USER_MAIN_URL)
-public class UserController {
+public class UserController implements UserControllerApi {
     private final UserService userService;
     
+    @Override
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
     
+    @Override
     @GetMapping(USER_ID_URL)
     @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
     
+    @Override
     @PutMapping(USER_ID_URL)
     @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updateById(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
         return ResponseEntity.ok(userService.update(id, request));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<UserResponse> create(@RequestBody @Valid UserCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
 
+    @Override
     @PatchMapping(USER_DISABLE_URL)
     @PreAuthorize("!@securityServiceImpl.securityService.isCurrentUserOwner(id) || hasRole('ADMIN')")
     public ResponseEntity<UserResponse> disable(@PathVariable Long id) {

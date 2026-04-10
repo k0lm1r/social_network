@@ -5,10 +5,12 @@ COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY identity_service/build.gradle.kts identity_service/build.gradle.kts
 COPY proto/build.gradle.kts proto/build.gradle.kts
+COPY logging-common/build.gradle.kts logging-common/build.gradle.kts
 
 RUN gradle :identity_service:dependencies --no-daemon || true
 
 COPY identity_service identity_service
+COPY logging-common logging-common
 COPY proto proto
 
 RUN gradle :identity_service:bootJar --no-daemon

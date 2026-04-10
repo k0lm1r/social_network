@@ -7,7 +7,8 @@ rootProject.name = "social-network"
 val modules = listOf("identity_service",
                     "proto",
                     "eureka_server",
-                    "api_gateway")
+                    "api_gateway",
+                    "logging-common")
 
 modules
     .filter { file(it).isDirectory }

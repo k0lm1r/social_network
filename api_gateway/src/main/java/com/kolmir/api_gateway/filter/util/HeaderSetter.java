@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class HeaderSetter {
     private final TokenValidationService tokenValidationService;
 
-    public ServerHttpRequest replaceJwtByUserData(ServerHttpRequest request, String jwt) {
+    public ServerHttpRequest addUserData(ServerHttpRequest request, String jwt) {
         UserResponse userData = tokenValidationService.getUserFromToken(jwt);
         return request.mutate()
             .header(USERNAME_HEADER, userData.getUsername())

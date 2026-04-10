@@ -3,6 +3,7 @@ package com.kolmir.identity_service.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kolmir.identity_service.controller.api.AuthControllerApi;
 import com.kolmir.identity_service.dto.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
@@ -21,19 +22,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AUTH_PATH)
-public class AuthController {
+public class AuthController implements AuthControllerApi {
     private final SecurityService securityService;
 
+    @Override
     @PostMapping(LOGIN_PATH)
     public ResponseEntity<UserAuthResponse> loginUser(@RequestBody UserAuthRequest request) {
         return ResponseEntity.ok(securityService.login(request));
     }
     
+    @Override
     @PostMapping(REGISTER_PATH)
     public ResponseEntity<UserRegisterResponse> registerUser(@RequestBody UserCreateRequest request) {
         return ResponseEntity.ok(securityService.register(request));
     }
 
+    @Override
     @PostMapping(REFRESH_PATH)
     public ResponseEntity<UserAuthResponse> refreshUserToken(@RequestBody RefreshTokenRequest refreshToken) {
         return ResponseEntity.ok(securityService.refresh(refreshToken));
