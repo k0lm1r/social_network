@@ -5,6 +5,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import static com.kolmir.api_gateway.util.FilterConstants.*;
+
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -17,7 +21,7 @@ public class LoggingAspect {
         String methodName = jp.getSignature().toShortString();
         Object[] args = jp.getArgs();
 
-        log.info("method - {}, args - {}", methodName, args);
+        log.info("method - {}, args - {}", methodName, protectArgs(args));
 
         long start = System.currentTimeMillis();
 
@@ -33,11 +37,23 @@ public class LoggingAspect {
 
             return result;
         } catch (RuntimeException e) {
-            log.warn("runtime exception - {}", e.getMessage());
+            log.warn("runtime exception - {}", e);
             throw e;
         } catch(Throwable t) {
-            log.error("exception - {}", t.getMessage());
+            log.error("exception - {}", t);
             throw t;
         }
+    }
+
+    private Object[] protectArgs(Object[] args) {
+        return Arrays.stream(args)
+                    .map(this::protectArg)
+                    .toArray();
+    }
+
+    private Object protectArg(Object arg) {
+        if (arg instanceof String && ((String)arg).startsWith("Bearer "))
+            return REDACTERED_TOKEN;
+        return arg;
     }
 }

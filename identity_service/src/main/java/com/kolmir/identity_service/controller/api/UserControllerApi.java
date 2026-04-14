@@ -3,6 +3,7 @@ package com.kolmir.identity_service.controller.api;
 import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
+import com.kolmir.identity_service.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Tag(name = "Users", description = "User management endpoints")
@@ -83,4 +85,20 @@ public interface UserControllerApi {
         )
     })
     ResponseEntity<UserResponse> disable(@PathVariable Long id);
+
+    @Operation(summary = "Change user role", description = "Changes role for a user by id. Requires MAIN_ADMIN role")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User role changed"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Access denied",
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+        )
+    })
+    ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestParam UserRole newRole);
 }

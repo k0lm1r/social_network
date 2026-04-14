@@ -5,6 +5,7 @@ import java.util.List;
 import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
+import com.kolmir.identity_service.model.UserRole;
 
 
 public interface UserService {
@@ -13,4 +14,5 @@ public interface UserService {
     public UserResponse save(UserCreateRequest request);
     public UserResponse update(Long id, UserUpdateRequest request);
     public UserResponse disable(Long id);
+    public UserResponse changeRole(Long id, UserRole newRole);
 }

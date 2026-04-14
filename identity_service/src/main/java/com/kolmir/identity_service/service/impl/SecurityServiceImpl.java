@@ -43,7 +43,8 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public UserRegisterResponse register(UserCreateRequest request) {
         UserAuthRequest auth = authMapper.userCreateRequestToUserAuthRequest(request);
-        return new UserRegisterResponse(authUser(auth), userService.save(request));
+        UserResponse userResponse = userService.save(request);
+        return new UserRegisterResponse(authUser(auth), userResponse);
     }
 
     @Override

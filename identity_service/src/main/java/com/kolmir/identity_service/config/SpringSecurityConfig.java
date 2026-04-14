@@ -25,7 +25,8 @@ public class SpringSecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html"
                 ).permitAll()
-                .requestMatchers(USER_DISABLE_URL, USER_MAIN_URL).hasRole(UserRole.ADMIN.getStringName())
+                .requestMatchers(CHANGE_ROLE_URL).hasRole(UserRole.MAIN_ADMIN.getStringName())
+                .requestMatchers(USER_DISABLE_URL, USER_MAIN_URL).hasAnyRole(UserRole.ADMIN.getStringName(), UserRole.MAIN_ADMIN.getStringName())
                 .anyRequest().authenticated()
             )
             .sessionManagement(

@@ -1,6 +1,24 @@
 package com.kolmir.identity_service.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.jwtWithSubject;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.keycloakTokenResponse;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.refreshTokenRequest;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.user;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.userAuthRequest;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.userAuthResponse;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.userCreateRequest;
+import static com.kolmir.identity_service.testutil.IdentityTestObjectFactory.userResponse;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.ACCESS_TOKEN;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.BIO;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.DISPLAY_NAME;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.EMAIL;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.KEYCLOAK_ID;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.KEYCLOAK_ID_ALT;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.PASSWORD;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.REFRESH_TOKEN;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.REFRESH_TOKEN_VALUE;
+import static com.kolmir.identity_service.testutil.IdentityTestStringConstants.USERNAME;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +43,7 @@ import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.mapper.AuthMapper;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
+import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.service.UserService;
@@ -57,30 +76,25 @@ class SecurityServiceImplTest {
 
     @Test
     void isCurrentUserOwner_shouldCheckUserIdAndKeycloakIdFromJwt() {
-        setJwtSubject("kc-100");
-        when(userRepository.existsByIdAndKeycloakId(100L, "kc-100")).thenReturn(true);
+        setJwtSubject(KEYCLOAK_ID);
+        when(userRepository.existsByIdAndKeycloakId(100L, KEYCLOAK_ID)).thenReturn(true);
 
         boolean result = securityService.isCurrentUserOwner(100L);
 
         assertThat(result).isTrue();
-        verify(userRepository).existsByIdAndKeycloakId(100L, "kc-100");
+        verify(userRepository).existsByIdAndKeycloakId(100L, KEYCLOAK_ID);
     }
 
     @Test
     void register_shouldAuthenticateAndCreateUser() {
-        UserCreateRequest createRequest = new UserCreateRequest("mail@test.com", "user", "pass1234", "Disp", "bio");
-        UserAuthRequest authRequest = new UserAuthRequest("user", "pass1234");
-        Map<String, Object> keycloakResponse = Map.of(
-                "access_token", "a",
-                "refresh_token", "r",
-                "expires_in", 300,
-                "refresh_expires_in", 900
-        );
-        UserAuthResponse authResponse = new UserAuthResponse("a", 300, "r", 900);
-        UserResponse userResponse = new UserResponse(10L, "mail@test.com", "user", "Disp", "bio", true);
+        UserCreateRequest createRequest = userCreateRequest(EMAIL, USERNAME, PASSWORD, DISPLAY_NAME, BIO);
+        UserAuthRequest authRequest = userAuthRequest(USERNAME, PASSWORD);
+        Map<String, Object> keycloakResponse = keycloakTokenResponse(ACCESS_TOKEN, REFRESH_TOKEN, 300, 900);
+        UserAuthResponse authResponse = userAuthResponse(ACCESS_TOKEN, 300, REFRESH_TOKEN, 900);
+        UserResponse userResponse = userResponse(10L, EMAIL, USERNAME, DISPLAY_NAME, BIO, UserRole.USER, true);
 
         when(authMapper.userCreateRequestToUserAuthRequest(createRequest)).thenReturn(authRequest);
-        when(userAuthProvider.getTokensForUser("user", "pass1234")).thenReturn(keycloakResponse);
+        when(userAuthProvider.getTokensForUser(USERNAME, PASSWORD)).thenReturn(keycloakResponse);
         when(authMapper.keycloakResponseToUserAuth(keycloakResponse)).thenReturn(authResponse);
         when(userService.save(createRequest)).thenReturn(userResponse);
 
@@ -89,78 +103,60 @@ class SecurityServiceImplTest {
         assertThat(result.auth()).isEqualTo(authResponse);
         assertThat(result.user()).isEqualTo(userResponse);
         verify(authMapper).userCreateRequestToUserAuthRequest(createRequest);
-        verify(userAuthProvider).getTokensForUser("user", "pass1234");
+        verify(userAuthProvider).getTokensForUser(USERNAME, PASSWORD);
         verify(userService).save(createRequest);
     }
 
     @Test
     void login_shouldReturnTokensMappedFromProviderResponse() {
-        UserAuthRequest request = new UserAuthRequest("user", "pass1234");
-        Map<String, Object> keycloakResponse = Map.of(
-                "access_token", "a",
-                "refresh_token", "r",
-                "expires_in", 300,
-                "refresh_expires_in", 900
-        );
-        UserAuthResponse authResponse = new UserAuthResponse("a", 300, "r", 900);
+        UserAuthRequest request = userAuthRequest(USERNAME, PASSWORD);
+        Map<String, Object> keycloakResponse = keycloakTokenResponse(ACCESS_TOKEN, REFRESH_TOKEN, 300, 900);
+        UserAuthResponse authResponse = userAuthResponse(ACCESS_TOKEN, 300, REFRESH_TOKEN, 900);
 
-        when(userAuthProvider.getTokensForUser("user", "pass1234")).thenReturn(keycloakResponse);
+        when(userAuthProvider.getTokensForUser(USERNAME, PASSWORD)).thenReturn(keycloakResponse);
         when(authMapper.keycloakResponseToUserAuth(keycloakResponse)).thenReturn(authResponse);
 
         UserAuthResponse result = securityService.login(request);
 
         assertThat(result).isEqualTo(authResponse);
-        verify(userAuthProvider).getTokensForUser("user", "pass1234");
+        verify(userAuthProvider).getTokensForUser(USERNAME, PASSWORD);
         verify(authMapper).keycloakResponseToUserAuth(keycloakResponse);
     }
 
     @Test
     void refresh_shouldReturnMappedTokens() {
-        RefreshTokenRequest request = new RefreshTokenRequest("refresh-token");
-        Map<String, Object> keycloakResponse = Map.of(
-                "access_token", "a2",
-                "refresh_token", "r2",
-                "expires_in", 120,
-                "refresh_expires_in", 720
-        );
-        UserAuthResponse authResponse = new UserAuthResponse("a2", 120, "r2", 720);
+        RefreshTokenRequest request = refreshTokenRequest(REFRESH_TOKEN_VALUE);
+        Map<String, Object> keycloakResponse = keycloakTokenResponse(ACCESS_TOKEN, REFRESH_TOKEN, 120, 720);
+        UserAuthResponse authResponse = userAuthResponse(ACCESS_TOKEN, 120, REFRESH_TOKEN, 720);
 
-        when(userAuthProvider.refreshUserToken("refresh-token")).thenReturn(keycloakResponse);
+        when(userAuthProvider.refreshUserToken(REFRESH_TOKEN_VALUE)).thenReturn(keycloakResponse);
         when(authMapper.keycloakResponseToUserAuth(keycloakResponse)).thenReturn(authResponse);
 
         UserAuthResponse result = securityService.refresh(request);
 
         assertThat(result).isEqualTo(authResponse);
-        verify(userAuthProvider).refreshUserToken("refresh-token");
+        verify(userAuthProvider).refreshUserToken(REFRESH_TOKEN_VALUE);
         verify(authMapper).keycloakResponseToUserAuth(keycloakResponse);
     }
 
     @Test
     void getUserFromPrincipal_shouldReadUserByJwtSubject() {
-        setJwtSubject("kc-55");
-        User user = new User();
-        user.setId(55L);
-        user.setKeycloakId("kc-55");
-        user.setEmail("mail55@test.com");
-        user.setUsername("u55");
-        UserResponse mapped = new UserResponse(55L, "mail55@test.com", "u55", "d", "b", true);
+        setJwtSubject(KEYCLOAK_ID_ALT);
+        User user = user(55L, KEYCLOAK_ID_ALT, EMAIL, USERNAME, null, null, true);
+        UserResponse mapped = userResponse(55L, EMAIL, USERNAME, DISPLAY_NAME, BIO, UserRole.USER, true);
 
-        when(userRepository.getUserByKeycloakId("kc-55")).thenReturn(user);
+        when(userRepository.getUserByKeycloakId(KEYCLOAK_ID_ALT)).thenReturn(user);
         when(userMapper.toUserResponse(user)).thenReturn(mapped);
 
         UserResponse result = securityService.getUserFromPrincipal();
 
         assertThat(result).isEqualTo(mapped);
-        verify(userRepository).getUserByKeycloakId("kc-55");
+        verify(userRepository).getUserByKeycloakId(KEYCLOAK_ID_ALT);
         verify(userMapper).toUserResponse(user);
     }
 
     private static void setJwtSubject(String subject) {
-        Jwt jwt = Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .subject(subject)
-                .claim("sub", subject)
-                .build();
+        Jwt jwt = jwtWithSubject(subject);
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken(jwt, null));
     }

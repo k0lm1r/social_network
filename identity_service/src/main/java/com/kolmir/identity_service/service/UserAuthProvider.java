@@ -12,4 +12,6 @@ public interface UserAuthProvider {
     public void disableUser(String userId);
     public Map<String, Object> getTokensForUser(String username, String password);
     public Map<String, Object> refreshUserToken(String refreshToken);
+    public void deleteUser(String userId);
+    public void changeUserRole(String userId, String oldRole, String newRole);
 }

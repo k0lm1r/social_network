@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,7 +28,7 @@ public interface AuthControllerApi {
             content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserAuthResponse> loginUser(@RequestBody UserAuthRequest request);
+    ResponseEntity<UserAuthResponse> loginUser(@RequestBody @Valid UserAuthRequest request);
 
     @Operation(summary = "User registration", description = "Creates a new user account")
     @ApiResponses({
@@ -42,7 +44,7 @@ public interface AuthControllerApi {
             content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserRegisterResponse> registerUser(@RequestBody UserCreateRequest request);
+    ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserCreateRequest request);
 
     @Operation(summary = "Refresh tokens", description = "Returns new token pair by refresh token")
     @ApiResponses({
@@ -53,5 +55,5 @@ public interface AuthControllerApi {
             content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserAuthResponse> refreshUserToken(@RequestBody RefreshTokenRequest refreshToken);
+    ResponseEntity<UserAuthResponse> refreshUserToken(@RequestBody @Valid RefreshTokenRequest refreshToken);
 }

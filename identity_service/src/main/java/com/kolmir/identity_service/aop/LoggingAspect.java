@@ -10,6 +10,8 @@ import com.kolmir.identity_service.dto.UserAuthResponse;
 import com.kolmir.identity_service.dto.UserRegisterResponse;
 import static com.kolmir.identity_service.util.AuthConstants.*;
 
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -18,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class LoggingAspect {
 
-    @Pointcut("within(com.kolmir.identity_service.service..*)")
+    @Pointcut("execution(* com.kolmir.identity_service.service..*(..))")
     public void serviceLayer() {}
 
-    @Pointcut("!within(com.kolmir.identity_service.service.UserAuthProviderImpl)")
+    @Pointcut("!execution(* com.kolmir.identity_service.service.impl.UserAuthProviderImpl.*(..))")
     public void userAuthProviderExclude() {}
 
     @Around("serviceLayer() && userAuthProviderExclude()")
@@ -29,7 +31,7 @@ public class LoggingAspect {
         String methodName = jp.getSignature().toShortString();
         Object[] args = jp.getArgs();
 
-        log.info("method - {}, args - {}", methodName, args);
+        log.info("method - {}, args - {}", methodName, protectArgs(args));
 
         long start = System.currentTimeMillis();
 
@@ -40,25 +42,33 @@ public class LoggingAspect {
             if (result == null) {
                 log.info("result - null, {} ms", end - start);
             } else {
-                log.info("result - {}, {} ms", protectResult(result), end - start);
+                log.info("result - {}, {} ms", protectData(result), end - start);
             }
 
             return result;
         } catch (RuntimeException e) {
-            log.warn("runtime exception - {}", e.getMessage());
+            log.warn("runtime exception - {}", e);
             throw e;
         } catch(Throwable t) {
-            log.error("exception - {}", t.getMessage());
+            log.error("exception - {}", t);
             throw t;
         }
     }
 
-    private Object protectResult(Object result) {
+    private Object[] protectArgs(Object[] args) {
+        return Arrays.stream(args)
+                .map(this::protectData)
+                .toArray();
+    }
+
+    private Object protectData(Object result) {
         if (result instanceof UserAuthResponse) {
            return getSafeAuthResponse((UserAuthResponse)result);
         } else if (result instanceof UserRegisterResponse) {
             UserRegisterResponse response = (UserRegisterResponse) result;
             return new UserRegisterResponse(getSafeAuthResponse(response.auth()), response.user());
+        } else if (result instanceof String && ((String)result).startsWith("Bearer ")) {
+            return REDACTED_TOKEN;
         }
         return result;
     }

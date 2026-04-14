@@ -25,11 +25,13 @@ import org.springframework.web.client.RestTemplate;
 import com.kolmir.identity_service.dto.UserCreateRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
+import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
@@ -73,20 +75,28 @@ public class UserAuthProviderImpl implements UserAuthProvider {
     
     @Override
     public void changeUserInfo(User user) {
-        UserResource userResource = keycloak.realm(realm).users()
-        .get(user.getKeycloakId().toString());
+        UserResource userResource = keycloak.realm(realm)
+        .users()
+        .get(user.getKeycloakId());
         UserRepresentation userRepresentation = userResource.toRepresentation();
         
         userRepresentation.setUsername(user.getUsername());
         userRepresentation.setEmail(user.getEmail());
         
-        userResource.update(userRepresentation);
+        try {
+            if (!userResource.toRepresentation().equals(userRepresentation)) {
+                userResource.update(userRepresentation);
+            }
+        } catch (WebApplicationException we) {
+            Response response = we.getResponse();
+            throw new UpdatingException(response != null && response.hasEntity() ? response.readEntity(String.class) : we.getMessage());
+        }
     }
     
     @Override
     public void disableUser(String userId) {
         UserResource userResource = keycloak.realm(realm).users()
-        .get(userId.toString());
+        .get(userId);
         UserRepresentation userRepresentation = userResource.toRepresentation();
         
         userRepresentation.setEnabled(false);
@@ -140,6 +150,13 @@ public class UserAuthProviderImpl implements UserAuthProvider {
         return response.getBody();
     }
     
+    @Override
+    public void deleteUser(String userId) {
+        keycloak.realm(realm)
+            .users()
+            .delete(userId);
+    }
+
     private UserRepresentation getRepresentation(UserCreateRequest request) {
         UserRepresentation user = new UserRepresentation();
         
@@ -171,9 +188,36 @@ public class UserAuthProviderImpl implements UserAuthProvider {
             .realmLevel()
             .add(List.of(roleRepresentation));
     }
+
+    @Override
+    public void changeUserRole(String userId, String oldRole, String newRole) {
+        try {
+            deleteUserRole(userId, oldRole);
+            setUserRole(userId, newRole);
+        } catch (Exception e) {
+            deleteUserRole(userId, newRole);
+            setUserRole(userId, oldRole);
+            throw e;
+        }
+    }
+
+    private void deleteUserRole(String userId, String role) {
+        RoleRepresentation roleRepresentation = keycloak.realm(realm)
+                                                    .roles()
+                                                    .get(role)
+                                                    .toRepresentation();
+
+        keycloak.realm(realm)
+            .users()
+            .get(userId)
+            .roles()
+            .realmLevel()
+            .remove(List.of(roleRepresentation));
+    }
         
     private String getTokenUrl() {
         return String.format("%s/realms/%s/protocol/openid-connect/token", serverUrl, realm);
     }
+
 }
                                         

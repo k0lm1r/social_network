@@ -1,11 +1,37 @@
 package com.kolmir.api_gateway;
 
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.AUTH_HEADER;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.DISCOVERY_ENABLED_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.DISCOVERY_LOCATOR_ENABLED_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.EMAIL_ALICE;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.EMAIL_HEADER;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.EUREKA_ENABLED_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.FALSE;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.PATH_AUTH_LOGIN;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.PATH_UNMATCHED;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.PATH_USER_42;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.RESPONSE_AUTHORIZED;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.RESPONSE_OK;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROLE_HEADER;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROUTE_ID;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROUTE_ID_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROUTE_PREDICATE;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROUTE_PREDICATE_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROUTE_URI_PROPERTY;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.ROOT_PATH;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.USERNAME_ALICE;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.USERNAME_HEADER;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.USER_ROLE;
+import static com.kolmir.api_gateway.testutil.GatewayTestConstants.BEARER_TOKEN;
+import static com.kolmir.api_gateway.testutil.GatewayTestObjectFactory.httpGetRequest;
+import static com.kolmir.api_gateway.testutil.GatewayTestObjectFactory.httpGetRequestWithHeader;
+import static com.kolmir.api_gateway.testutil.GatewayTestObjectFactory.mockResponse;
+import static com.kolmir.api_gateway.testutil.GatewayTestObjectFactory.userResponse;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,17 +54,11 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import com.kolmir.api_gateway.service.TokenValidationService;
 import com.kolmir.validate_token.UserResponse;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GatewayIntegrationTest {
-
-    private static final String AUTH_HEADER = "Authorization";
-    private static final String USERNAME_HEADER = "X-User-Name";
-    private static final String EMAIL_HEADER = "X-User-Email";
-    private static final String ROLE_HEADER = "X-User-Role";
 
     private static MockWebServer backend;
 
@@ -74,69 +94,54 @@ class GatewayIntegrationTest {
             }
         }
 
-        registry.add("eureka.client.enabled", () -> "false");
-        registry.add("spring.cloud.discovery.enabled", () -> "false");
-        registry.add("spring.cloud.gateway.server.webflux.discovery.locator.enabled", () -> "false");
-        registry.add("spring.cloud.gateway.server.webflux.routes[0].id", () -> "identity-route-test");
-        registry.add("spring.cloud.gateway.server.webflux.routes[0].uri", () -> backend.url("/").toString());
-        registry.add("spring.cloud.gateway.server.webflux.routes[0].predicates[0]", () -> "Path=/api/users/**,/api/auth/**");
+        registry.add(EUREKA_ENABLED_PROPERTY, () -> FALSE);
+        registry.add(DISCOVERY_ENABLED_PROPERTY, () -> FALSE);
+        registry.add(DISCOVERY_LOCATOR_ENABLED_PROPERTY, () -> FALSE);
+        registry.add(ROUTE_ID_PROPERTY, () -> ROUTE_ID);
+        registry.add(ROUTE_URI_PROPERTY, () -> backend.url(ROOT_PATH).toString());
+        registry.add(ROUTE_PREDICATE_PROPERTY, () -> ROUTE_PREDICATE);
     }
 
     @Test
     void shouldRouteUserRequestToIdentityService() throws Exception {
-        backend.enqueue(new MockResponse().setResponseCode(200).setBody("ok"));
+        backend.enqueue(mockResponse(200, RESPONSE_OK));
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + gatewayPort + "/api/users/42"))
-                .GET()
-                .build();
+        HttpRequest request = httpGetRequest(gatewayPort, PATH_USER_42);
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         org.assertj.core.api.Assertions.assertThat(response.statusCode()).isEqualTo(200);
-        org.assertj.core.api.Assertions.assertThat(response.body()).isEqualTo("ok");
+        org.assertj.core.api.Assertions.assertThat(response.body()).isEqualTo(RESPONSE_OK);
 
         RecordedRequest routedRequest = backend.takeRequest(2, TimeUnit.SECONDS);
         org.assertj.core.api.Assertions.assertThat(routedRequest).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(routedRequest.getPath()).isEqualTo("/api/users/42");
+        org.assertj.core.api.Assertions.assertThat(routedRequest.getPath()).isEqualTo(PATH_USER_42);
         verifyNoInteractions(tokenValidationService);
     }
 
     @Test
     void shouldRouteAuthRequestAndInjectUserHeadersWhenAuthorizationProvided() throws Exception {
-        backend.enqueue(new MockResponse().setResponseCode(200).setBody("authorized"));
-        String token = "Bearer token-value";
-        UserResponse user = UserResponse.newBuilder()
-                .setId(5)
-                .setUsername("alice")
-                .setEmail("alice@test.com")
-                .setRole("USER")
-                .build();
+        backend.enqueue(mockResponse(200, RESPONSE_AUTHORIZED));
+        String token = BEARER_TOKEN;
+        UserResponse user = userResponse(5, USERNAME_ALICE, EMAIL_ALICE, USER_ROLE);
         when(tokenValidationService.getUserFromToken(token)).thenReturn(user);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + gatewayPort + "/api/auth/login"))
-                .header(AUTH_HEADER, token)
-                .GET()
-                .build();
+        HttpRequest request = httpGetRequestWithHeader(gatewayPort, PATH_AUTH_LOGIN, AUTH_HEADER, token);
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         org.assertj.core.api.Assertions.assertThat(response.statusCode()).isEqualTo(200);
-        org.assertj.core.api.Assertions.assertThat(response.body()).isEqualTo("authorized");
+        org.assertj.core.api.Assertions.assertThat(response.body()).isEqualTo(RESPONSE_AUTHORIZED);
 
         RecordedRequest routedRequest = backend.takeRequest(2, TimeUnit.SECONDS);
         org.assertj.core.api.Assertions.assertThat(routedRequest).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(USERNAME_HEADER)).isEqualTo("alice");
-        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(EMAIL_HEADER)).isEqualTo("alice@test.com");
-        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(ROLE_HEADER)).isEqualTo("USER");
+        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(USERNAME_HEADER)).isEqualTo(USERNAME_ALICE);
+        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(EMAIL_HEADER)).isEqualTo(EMAIL_ALICE);
+        org.assertj.core.api.Assertions.assertThat(routedRequest.getHeader(ROLE_HEADER)).isEqualTo(USER_ROLE);
         verify(tokenValidationService).getUserFromToken(token);
     }
 
     @Test
     void shouldNotRouteUnmatchedPath() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + gatewayPort + "/unmatched/path"))
-                .GET()
-                .build();
+        HttpRequest request = httpGetRequest(gatewayPort, PATH_UNMATCHED);
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         org.assertj.core.api.Assertions.assertThat(response.statusCode()).isEqualTo(404);
