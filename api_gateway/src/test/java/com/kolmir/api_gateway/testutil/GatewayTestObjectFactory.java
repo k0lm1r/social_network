@@ -13,7 +13,7 @@ import okhttp3.mockwebserver.MockResponse;
 public class GatewayTestObjectFactory {
     public static HttpRequest httpGetRequest(int gatewayPort, String path) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(GatewayTestConstants.BASE_URL_PREFIX + gatewayPort + path))
+                .uri(URI.create(ApiGatewayTestConstants.BASE_URL_PREFIX + gatewayPort + path))
                 .GET()
                 .build();
     }
@@ -25,7 +25,7 @@ public class GatewayTestObjectFactory {
             String headerValue
     ) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(GatewayTestConstants.BASE_URL_PREFIX + gatewayPort + path))
+                .uri(URI.create(ApiGatewayTestConstants.BASE_URL_PREFIX + gatewayPort + path))
                 .header(headerName, headerValue)
                 .GET()
                 .build();

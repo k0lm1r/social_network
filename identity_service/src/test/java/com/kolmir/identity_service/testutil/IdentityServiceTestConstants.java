@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 
 
 @UtilityClass
-public class IdentityTestStringConstants {
+public class IdentityServiceTestConstants {
 
     public static final String KEYCLOAK_ID = "kc-id";
     public static final String KEYCLOAK_ID_ALT = "kc-alt";
@@ -41,4 +41,24 @@ public class IdentityTestStringConstants {
     public static final String JWT_HEADER_ALG = "alg";
     public static final String JWT_ALG_NONE = "none";
     public static final String JWT_SUB_CLAIM = "sub";
+
+    public static final long USER_ID_1 = 1L;
+    public static final long USER_ID_3 = 3L;
+    public static final long USER_ID_5 = 5L;
+    public static final long USER_ID_7 = 7L;
+    public static final long USER_ID_10 = 10L;
+    public static final long USER_ID_11 = 11L;
+    public static final long USER_ID_55 = 55L;
+    public static final long USER_ID_77 = 77L;
+    public static final long USER_ID_99 = 99L;
+    public static final long USER_ID_100 = 100L;
+
+    public static final int ACCESS_TOKEN_EXPIRES_IN = 300;
+    public static final int REFRESH_TOKEN_EXPIRES_IN = 900;
+    public static final int REFRESHED_ACCESS_TOKEN_EXPIRES_IN = 120;
+    public static final int REFRESHED_REFRESH_TOKEN_EXPIRES_IN = 720;
+
+    public static final int HTTP_CREATED = 201;
+    public static final int HTTP_CONFLICT = 409;
+    public static final int HTTP_INTERNAL_SERVER_ERROR = 500;
 }

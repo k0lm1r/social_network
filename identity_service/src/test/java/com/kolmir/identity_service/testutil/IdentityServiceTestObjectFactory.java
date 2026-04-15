@@ -3,7 +3,7 @@ package com.kolmir.identity_service.testutil;
 import com.kolmir.identity_service.dto.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
 import com.kolmir.identity_service.model.User;
@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 
 @UtilityClass
-public class IdentityTestObjectFactory {
+public class IdentityServiceTestObjectFactory {
     public static User user(
             Long id,
             String keycloakId,
@@ -39,14 +39,14 @@ public class IdentityTestObjectFactory {
         return user;
     }
 
-    public static UserCreateRequest userCreateRequest(
+    public static UserRegisterRequest userCreateRequest(
             String email,
             String username,
             String password,
             String displayName,
             String bio
     ) {
-        return new UserCreateRequest(email, username, password, displayName, bio);
+        return new UserRegisterRequest(email, username, password, displayName, bio);
     }
 
     public static UserUpdateRequest userUpdateRequest(
@@ -89,18 +89,18 @@ public class IdentityTestObjectFactory {
             int refreshExpiresIn
     ) {
         return Map.of(
-                IdentityTestStringConstants.KEY_ACCESS_TOKEN, accessToken,
-                IdentityTestStringConstants.KEY_REFRESH_TOKEN, refreshToken,
-                IdentityTestStringConstants.KEY_EXPIRES_IN, expiresIn,
-                IdentityTestStringConstants.KEY_REFRESH_EXPIRES_IN, refreshExpiresIn
+                IdentityServiceTestConstants.KEY_ACCESS_TOKEN, accessToken,
+                IdentityServiceTestConstants.KEY_REFRESH_TOKEN, refreshToken,
+                IdentityServiceTestConstants.KEY_EXPIRES_IN, expiresIn,
+                IdentityServiceTestConstants.KEY_REFRESH_EXPIRES_IN, refreshExpiresIn
         );
     }
 
     public static Jwt jwtWithSubject(String subject) {
-        return Jwt.withTokenValue(IdentityTestStringConstants.JWT_TOKEN_VALUE)
-                .header(IdentityTestStringConstants.JWT_HEADER_ALG, IdentityTestStringConstants.JWT_ALG_NONE)
+        return Jwt.withTokenValue(IdentityServiceTestConstants.JWT_TOKEN_VALUE)
+                .header(IdentityServiceTestConstants.JWT_HEADER_ALG, IdentityServiceTestConstants.JWT_ALG_NONE)
                 .subject(subject)
-                .claim(IdentityTestStringConstants.JWT_SUB_CLAIM, subject)
+                .claim(IdentityServiceTestConstants.JWT_SUB_CLAIM, subject)
                 .build();
     }
 
