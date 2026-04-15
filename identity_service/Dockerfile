@@ -13,7 +13,7 @@ COPY identity_service identity_service
 COPY logging-common logging-common
 COPY proto proto
 
-RUN gradle :identity_service:bootJar --no-daemon
+RUN gradle :identity_service:bootJar -x test --no-daemon
 
 FROM eclipse-temurin:25-jre
 

@@ -10,7 +10,7 @@ import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.service.UserService;
-import static com.kolmir.identity_service.util.UserConstants.*;
+import static com.kolmir.identity_service.util.UserUtils.*;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class UserController implements UserControllerApi {
     @Override
     @PostMapping
     public ResponseEntity<UserResponse> create(@RequestBody @Valid UserCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveCreatedUser(request));
     }
 
     @Override

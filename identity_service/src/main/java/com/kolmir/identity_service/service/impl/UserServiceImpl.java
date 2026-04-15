@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.dto.UserUpdateRequest;
 import com.kolmir.identity_service.exception.CreatingException;
@@ -21,7 +22,7 @@ import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.service.UserService;
 import com.kolmir.identity_service.service.impl.util.UserFieldSetter;
-import static com.kolmir.identity_service.util.UserConstants.*;
+import static com.kolmir.identity_service.util.UserUtils.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,11 +48,16 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(getUserById(id));
     }
 
+    @Override
+    public UserResponse saveCreatedUser(UserCreateRequest request) {
+        Long userId = saveRegisteredUser(userMapper.toUserRegisterRequest(request)).id();
+        return changeRole(userId, request.role());
+    }
 
     @Override
-    public UserResponse save(UserCreateRequest request) {
+    public UserResponse saveRegisteredUser(UserRegisterRequest request) {
         String keycloakId = userAuthProvider.createUser(request);
-
+        
         if (!keycloakId.isEmpty()) {
             User user = userMapper.toUser(request);
             user.setKeycloakId(keycloakId);
@@ -125,4 +131,5 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
+
 }

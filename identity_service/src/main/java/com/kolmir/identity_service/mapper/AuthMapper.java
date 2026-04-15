@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 
 @Mapper(componentModel = "spring")
 public interface AuthMapper {
@@ -19,5 +19,5 @@ public interface AuthMapper {
         return new UserAuthResponse(accessToken, accessExpiresIn, refreshToken, refreshExpiresIn);
     }
 
-    public UserAuthRequest userCreateRequestToUserAuthRequest(UserCreateRequest request);
+    public UserAuthRequest userCreateRequestToUserAuthRequest(UserRegisterRequest request);
 }

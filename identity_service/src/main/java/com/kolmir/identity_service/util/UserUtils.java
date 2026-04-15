@@ -3,7 +3,7 @@ package com.kolmir.identity_service.util;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class UserConstants {
+public class UserUtils {
     public final String USER_MAIN_URL = "/api/users";
     public final String USER_ID_URL = "/{id}";
     public final String USER_DISABLE_URL = "/disable" + USER_ID_URL;
@@ -15,4 +15,8 @@ public class UserConstants {
     public final String CREATING_EXCEPTION_MESSAGE = "User creating error: ";
     public final String EMAIL_IN_USE_MESSAGE = "This email is already in use";
     public final String USERNAME_IN_USE_MESSAGE = "This username is already in use";
+
+    public String getShortBio(String bio) {
+        return String.format("%s...", bio.substring(0, Math.min(10, bio.length())));
+    }
 }

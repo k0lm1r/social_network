@@ -22,18 +22,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
-import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor; 
 
 
 @Service
@@ -55,7 +53,7 @@ public class UserAuthProviderImpl implements UserAuthProvider {
     private final RestTemplate restTemplate = new RestTemplate();
     
     @Override
-    public String createUser(UserCreateRequest request) {
+    public String createUser(UserRegisterRequest request) {
         UserRepresentation user = getRepresentation(request);
         UsersResource usersResourse = keycloak.realm(realm).users();
         
@@ -82,15 +80,8 @@ public class UserAuthProviderImpl implements UserAuthProvider {
         
         userRepresentation.setUsername(user.getUsername());
         userRepresentation.setEmail(user.getEmail());
-        
-        try {
-            if (!userResource.toRepresentation().equals(userRepresentation)) {
-                userResource.update(userRepresentation);
-            }
-        } catch (WebApplicationException we) {
-            Response response = we.getResponse();
-            throw new UpdatingException(response != null && response.hasEntity() ? response.readEntity(String.class) : we.getMessage());
-        }
+
+        userResource.update(userRepresentation);
     }
     
     @Override
@@ -101,53 +92,23 @@ public class UserAuthProviderImpl implements UserAuthProvider {
         
         userRepresentation.setEnabled(false);
         userResource.update(userRepresentation);
+        userResource.logout();
+        
     }
     
     @Override
     public Map<String, Object> getTokensForUser(String username, String password) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "password");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
-        body.add("username", username);
-        body.add("password", password);
-        
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-            getTokenUrl(),
-            HttpMethod.POST,
-            request,
-            new ParameterizedTypeReference<Map<String, Object>>() {}
-        );
-        
-        return response.getBody();
+        MultiValueMap<String, String> grants = new LinkedMultiValueMap<>();
+        grants.add("username", username);
+        grants.add("password", password);
+        return takeToken("password", grants);
     }
     
     @Override
     public Map<String, Object> refreshUserToken(String refreshToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "refresh_token");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
-        body.add("refresh_token", refreshToken);
-        
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-            getTokenUrl(),
-            HttpMethod.POST,
-            request,
-            new ParameterizedTypeReference<Map<String, Object>>() {}
-        );
-        
-        return response.getBody();
+        MultiValueMap<String, String> grants = new LinkedMultiValueMap<>();
+        grants.add("refresh_token", refreshToken);
+        return takeToken("refresh_token", grants);
     }
     
     @Override
@@ -157,7 +118,29 @@ public class UserAuthProviderImpl implements UserAuthProvider {
             .delete(userId);
     }
 
-    private UserRepresentation getRepresentation(UserCreateRequest request) {
+    private Map<String, Object> takeToken(String grantType, MultiValueMap<String, String> grants) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", grantType);
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.addAll(grants);
+        
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+            getTokenUrl(),
+            HttpMethod.POST,
+            request,
+            new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+        
+        return response.getBody();
+    }
+
+    private UserRepresentation getRepresentation(UserRegisterRequest request) {
         UserRepresentation user = new UserRepresentation();
         
         user.setEnabled(true);

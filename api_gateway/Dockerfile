@@ -13,7 +13,7 @@ RUN gradle :api_gateway:dependencies --no-daemon || true
 COPY proto proto
 COPY api_gateway api_gateway
 COPY logging-common logging-common
-RUN gradle :api_gateway:bootJar --no-daemon
+RUN gradle :api_gateway:bootJar -x test --no-daemon
 
 FROM eclipse-temurin:25-jre
 

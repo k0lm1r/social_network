@@ -1,6 +1,7 @@
 package com.kolmir.identity_service.security;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -14,8 +15,10 @@ import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
 public class KeycloakAuthoritiesConverter implements Converter<Jwt, AbstractAuthenticationToken> {
     
+    @SuppressWarnings("unchecked")
     public Collection<GrantedAuthority> getAuthorities(Jwt jwt) {
-        var realmRoles = jwt.getClaimAsStringList(ROLES_LIST_NAME);
+        var realmAccess = jwt.getClaimAsMap(REALM_ACCESS_NAME);
+        var realmRoles = (List<String>)realmAccess.get(ROLES_LIST_NAME);
 
         return realmRoles.stream()
                 .map(role -> "ROLE_" + role)

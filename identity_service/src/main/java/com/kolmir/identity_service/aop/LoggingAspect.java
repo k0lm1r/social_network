@@ -6,9 +6,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserRegisterResponse;
-import static com.kolmir.identity_service.util.AuthConstants.*;
+import static com.kolmir.identity_service.util.AuthUtils.*;
 
 import java.util.Arrays;
 
@@ -62,22 +64,13 @@ public class LoggingAspect {
     }
 
     private Object protectData(Object result) {
-        if (result instanceof UserAuthResponse) {
-           return getSafeAuthResponse((UserAuthResponse)result);
-        } else if (result instanceof UserRegisterResponse) {
-            UserRegisterResponse response = (UserRegisterResponse) result;
-            return new UserRegisterResponse(getSafeAuthResponse(response.auth()), response.user());
-        } else if (result instanceof String && ((String)result).startsWith("Bearer ")) {
-            return REDACTED_TOKEN;
-        }
-        return result;
-    }
-
-    private UserAuthResponse getSafeAuthResponse(UserAuthResponse response) {
-        return new UserAuthResponse(
-                    REDACTED_TOKEN, 
-                    response.accessExpiresIn(), 
-                    REDACTED_TOKEN, response.refreshExpiresIn()
-                );
+        return switch (result) {
+            case UserAuthResponse r -> getSafeAuthResponse(r);
+            case UserRegisterResponse r -> getSafeRegisterResponse(r);
+            case String _ -> REDACTED_MESSAGE;
+            case UserRegisterRequest r -> getSafeRegisterRequest(r);
+            case UserAuthRequest r -> getSafeAuthRequest(r);
+            default -> result;
+        };
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.kolmir.identity_service.dto.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserRegisterResponse;
 import com.kolmir.identity_service.dto.UserResponse;
 import com.kolmir.identity_service.mapper.AuthMapper;
@@ -41,9 +41,9 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public UserRegisterResponse register(UserCreateRequest request) {
+    public UserRegisterResponse register(UserRegisterRequest request) {
         UserAuthRequest auth = authMapper.userCreateRequestToUserAuthRequest(request);
-        UserResponse userResponse = userService.save(request);
+        UserResponse userResponse = userService.saveRegisteredUser(request);
         return new UserRegisterResponse(authUser(auth), userResponse);
     }
 

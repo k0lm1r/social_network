@@ -49,7 +49,7 @@ import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
-import com.kolmir.identity_service.util.UserConstants;
+import com.kolmir.identity_service.util.UserUtils;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -102,7 +102,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.getById(USER_ID_99))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(UserConstants.USER_ID_NOT_FOUND);
+                .hasMessage(UserUtils.USER_ID_NOT_FOUND);
     }
 
     @Test
@@ -185,6 +185,6 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.update(USER_ID_77, request))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(UserConstants.USER_ID_NOT_FOUND);
+                .hasMessage(UserUtils.USER_ID_NOT_FOUND);
     }
 }

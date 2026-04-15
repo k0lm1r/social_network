@@ -3,7 +3,7 @@ package com.kolmir.identity_service.controller.api;
 import com.kolmir.identity_service.dto.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserRegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,7 +44,7 @@ public interface AuthControllerApi {
             content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserCreateRequest request);
+    ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserRegisterRequest request);
 
     @Operation(summary = "Refresh tokens", description = "Returns new token pair by refresh token")
     @ApiResponses({

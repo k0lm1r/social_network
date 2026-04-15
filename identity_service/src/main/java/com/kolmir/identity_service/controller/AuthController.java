@@ -7,13 +7,13 @@ import com.kolmir.identity_service.controller.api.AuthControllerApi;
 import com.kolmir.identity_service.dto.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.UserAuthRequest;
 import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserCreateRequest;
+import com.kolmir.identity_service.dto.UserRegisterRequest;
 import com.kolmir.identity_service.dto.UserRegisterResponse;
 import com.kolmir.identity_service.service.SecurityService;
 
 import jakarta.validation.Valid;
 
-import static com.kolmir.identity_service.util.AuthConstants.*;
+import static com.kolmir.identity_service.util.AuthUtils.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class AuthController implements AuthControllerApi {
     
     @Override
     @PostMapping(REGISTER_PATH)
-    public ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserCreateRequest request) {
+    public ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserRegisterRequest request) {
         return ResponseEntity.ok(securityService.register(request));
     }
 
