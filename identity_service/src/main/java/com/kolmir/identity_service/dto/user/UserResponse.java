@@ -1,4 +1,4 @@
-package com.kolmir.identity_service.dto;
+package com.kolmir.identity_service.dto.user;
 
 import com.kolmir.identity_service.model.UserRole;
 

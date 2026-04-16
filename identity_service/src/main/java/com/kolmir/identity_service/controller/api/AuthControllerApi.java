@@ -1,10 +1,11 @@
 package com.kolmir.identity_service.controller.api;
 
-import com.kolmir.identity_service.dto.RefreshTokenRequest;
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserRegisterResponse;
+import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +26,7 @@ public interface AuthControllerApi {
         @ApiResponse(
             responseCode = "401",
             description = "Invalid credentials",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<UserAuthResponse> loginUser(@RequestBody @Valid UserAuthRequest request);
@@ -36,12 +37,12 @@ public interface AuthControllerApi {
         @ApiResponse(
             responseCode = "400",
             description = "Validation error",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         ),
         @ApiResponse(
             responseCode = "409",
             description = "User already exists",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<UserRegisterResponse> registerUser(@RequestBody @Valid UserRegisterRequest request);
@@ -52,7 +53,7 @@ public interface AuthControllerApi {
         @ApiResponse(
             responseCode = "401",
             description = "Refresh token is invalid or expired",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<UserAuthResponse> refreshUserToken(@RequestBody @Valid RefreshTokenRequest refreshToken);

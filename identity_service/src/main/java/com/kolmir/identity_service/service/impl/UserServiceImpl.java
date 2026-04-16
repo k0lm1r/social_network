@@ -6,15 +6,15 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kolmir.identity_service.dto.UserCreateRequest;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserResponse;
-import com.kolmir.identity_service.dto.UserUpdateRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
+import com.kolmir.identity_service.dto.user.UserCreateRequest;
+import com.kolmir.identity_service.dto.user.UserResponse;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.exception.NotFoundException;
 import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
-import com.kolmir.identity_service.exception.ChangingForbidenException;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.model.UserRole;
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse saveCreatedUser(UserCreateRequest request) {
         Long userId = saveRegisteredUser(userMapper.toUserRegisterRequest(request)).id();
-        return changeRole(userId, request.role());
+        return changeRole(userId, new UserChangeRoleRequest(request.role()));
     }
 
     @Override
@@ -95,19 +95,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse changeRole(Long id, UserRole newRole) {
-        if (newRole.equals(UserRole.MAIN_ADMIN))
-            throw new ChangingForbidenException(NO_PERMISIONS_EXCEPTION_MESSAGE);
-
+    public UserResponse changeRole(Long id, UserChangeRoleRequest request) {
         User user = getUserById(id);
         UserRole oldRole = user.getRole();
-        user.setRole(newRole);
-        userAuthProvider.changeUserRole(user.getKeycloakId(), oldRole.getStringName(), newRole.getStringName());
+        user.setRole(UserRole.valueOf(request.newRole()));
+        userAuthProvider.changeUserRole(user.getKeycloakId(), oldRole.getStringName(), request.newRole());
 
         try {
             return userMapper.toUserResponse(userRepository.save(user));
         } catch (Exception e) {
-            userAuthProvider.changeUserRole(user.getKeycloakId(), newRole.getStringName(), oldRole.getStringName());
+            userAuthProvider.changeUserRole(user.getKeycloakId(), request.newRole(), oldRole.getStringName());
             throw new UpdatingException(ROLE_CHANGING_EXCEPTION_MESSAGE + e.getMessage());
         }
     }

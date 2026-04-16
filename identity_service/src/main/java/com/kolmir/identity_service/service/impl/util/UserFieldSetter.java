@@ -1,6 +1,6 @@
 package com.kolmir.identity_service.service.impl.util;
 
-import com.kolmir.identity_service.dto.UserUpdateRequest;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 import com.kolmir.identity_service.model.User;
 
 import lombok.experimental.UtilityClass;

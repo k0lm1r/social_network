@@ -17,6 +17,8 @@ public class UserUtils {
     public final String USERNAME_IN_USE_MESSAGE = "This username is already in use";
 
     public String getShortBio(String bio) {
-        return String.format("%s...", bio.substring(0, Math.min(10, bio.length())));
+        if (bio == null || bio.length() < 10)
+            return bio;
+        return String.format("%s...", bio.substring(0, bio.length()));
     }
 }

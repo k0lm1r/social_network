@@ -1,4 +1,4 @@
-package com.kolmir.identity_service.dto;
+package com.kolmir.identity_service.dto.exception;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;

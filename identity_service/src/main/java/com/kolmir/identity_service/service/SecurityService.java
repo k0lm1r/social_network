@@ -1,11 +1,11 @@
 package com.kolmir.identity_service.service;
 
-import com.kolmir.identity_service.dto.RefreshTokenRequest;
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserRegisterResponse;
-import com.kolmir.identity_service.dto.UserResponse;
+import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
+import com.kolmir.identity_service.dto.user.UserResponse;
 
 
 public interface SecurityService {

@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.kolmir.identity_service.dto.ErrorResponse;
+import com.kolmir.identity_service.dto.exception.ErrorResponse;
+
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 
 import jakarta.ws.rs.BadRequestException;
@@ -65,8 +66,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleException(HttpClientErrorException e) {
         HttpStatusCode status = e.getStatusCode();
-        String message = status.value() == HttpStatus.UNAUTHORIZED.value() ?
-            UNAUTHORIZED_EXCEPTION_MESSAGE : e.getResponseBodyAsString();
+        String message;
+        if (status.value() == HttpStatus.UNAUTHORIZED.value()) {
+            message = UNAUTHORIZED_EXCEPTION_MESSAGE;
+        } else if (e.getResponseBodyAsString().contains(INVALID_GRANT)) {
+            message = USER_DISABLED_MESSAGE;
+        } else 
+            message = e.getResponseBodyAsString();
         return new ResponseEntity<>(getErrorResponse(message), status);
     }
 

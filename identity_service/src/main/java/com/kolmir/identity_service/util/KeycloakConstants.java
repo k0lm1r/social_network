@@ -13,6 +13,6 @@ public class KeycloakConstants {
     public final String LOCATION_HEADER_NAME = "Location";
     public final String UNAUTHORIZED_EXCEPTION_MESSAGE = "Username or password isn't correct";
     public final String BAD_REQUEST_EXCEPTION_MESSAGE = "Invalid request";
-    public final String INVALID_GRANT_TEMPLATE = "Invalid grant: %d";
+    public final String USER_DISABLED_MESSAGE = "User was disabled";
     public final String INVALID_GRANT = "invalid_grant";
 }

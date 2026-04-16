@@ -2,7 +2,7 @@ package com.kolmir.identity_service.service;
 
 import java.util.Map;
 
-import com.kolmir.identity_service.dto.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.model.User;
 
 

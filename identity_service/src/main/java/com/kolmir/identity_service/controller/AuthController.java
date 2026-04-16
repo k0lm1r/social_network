@@ -4,11 +4,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kolmir.identity_service.controller.api.AuthControllerApi;
-import com.kolmir.identity_service.dto.RefreshTokenRequest;
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserRegisterResponse;
+import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
 import com.kolmir.identity_service.service.SecurityService;
 
 import jakarta.validation.Valid;

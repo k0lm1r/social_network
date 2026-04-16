@@ -19,6 +19,7 @@ import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.PASSWORD;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USERNAME;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USERNAME_NEW;
+import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_ROLE;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_ID_1;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_ID_3;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_ID_5;
@@ -40,10 +41,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserResponse;
-import com.kolmir.identity_service.dto.UserUpdateRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
+import com.kolmir.identity_service.dto.user.UserCreateRequest;
+import com.kolmir.identity_service.dto.user.UserResponse;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
+import com.kolmir.identity_service.exception.AlreadyExistsException;
+import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.exception.NotFoundException;
+import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.model.UserRole;
@@ -141,6 +147,48 @@ class UserServiceImplTest {
     }
 
     @Test
+    void save_shouldDeleteCreatedKeycloakUserWhenDbSaveFails() {
+        UserRegisterRequest request = userCreateRequest(EMAIL_NEW, USERNAME_NEW, PASSWORD, DISPLAY_NAME_NEW, BIO);
+        User mapped = user(null, null, EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, BIO, true);
+
+        when(userAuthProvider.createUser(request)).thenReturn(KEYCLOAK_ID_CREATED);
+        when(userMapper.toUser(request)).thenReturn(mapped);
+        when(userRepository.save(mapped)).thenThrow(new RuntimeException("db error"));
+
+        assertThatThrownBy(() -> userService.saveRegisteredUser(request))
+                .isInstanceOf(CreatingException.class)
+                .hasMessageContaining(UserUtils.CREATING_EXCEPTION_MESSAGE);
+
+        verify(userAuthProvider).deleteUser(KEYCLOAK_ID_CREATED);
+    }
+
+    @Test
+    void saveCreatedUser_shouldRegisterThenChangeRole() {
+        UserCreateRequest createRequest = new UserCreateRequest(EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, "ADMIN");
+        UserRegisterRequest registerRequest = userCreateRequest(EMAIL_NEW, USERNAME_NEW, PASSWORD, DISPLAY_NAME_NEW, null);
+        User mapped = user(null, null, EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, null, true);
+        User created = user(USER_ID_11, KEYCLOAK_ID_CREATED, EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, null, true);
+        created.setRole(UserRole.USER);
+
+        UserResponse registeredResponse = userResponse(USER_ID_11, EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, null, UserRole.USER, true);
+        UserResponse changedRoleResponse = userResponse(USER_ID_11, EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, null, UserRole.ADMIN, true);
+
+        when(userMapper.toUserRegisterRequest(createRequest)).thenReturn(registerRequest);
+        when(userAuthProvider.createUser(registerRequest)).thenReturn(KEYCLOAK_ID_CREATED);
+        when(userMapper.toUser(registerRequest)).thenReturn(mapped);
+        when(userRepository.save(mapped)).thenReturn(created);
+        when(userRepository.findById(USER_ID_11)).thenReturn(Optional.of(created));
+        when(userRepository.save(created)).thenReturn(created);
+        when(userMapper.toUserResponse(created)).thenReturn(registeredResponse, changedRoleResponse);
+
+        UserResponse result = userService.saveCreatedUser(createRequest);
+
+        assertThat(result).isEqualTo(changedRoleResponse);
+        assertThat(created.getRole()).isEqualTo(UserRole.ADMIN);
+        verify(userAuthProvider).changeUserRole(KEYCLOAK_ID_CREATED, USER_ROLE, UserRole.ADMIN.getStringName());
+    }
+
+    @Test
     void update_shouldApplyFieldsCallProviderAndSave() {
         UserUpdateRequest request = userUpdateRequest(EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, BIO_NEW);
         User existing = user(USER_ID_3, KEYCLOAK_ID_ALT, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
@@ -186,5 +234,75 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> userService.update(USER_ID_77, request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(UserUtils.USER_ID_NOT_FOUND);
+    }
+
+    @Test
+    void update_shouldThrowWhenUsernameAlreadyUsedByAnotherUser() {
+        UserUpdateRequest request = userUpdateRequest(EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, BIO_NEW);
+        User existing = user(USER_ID_3, KEYCLOAK_ID_ALT, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
+        User another = user(USER_ID_99, "other-kc", EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, BIO_NEW, true);
+
+        when(userRepository.findById(USER_ID_3)).thenReturn(Optional.of(existing));
+        when(userRepository.findByUsernameIgnoreCase(USERNAME_NEW)).thenReturn(Optional.of(another));
+
+        assertThatThrownBy(() -> userService.update(USER_ID_3, request))
+                .isInstanceOf(AlreadyExistsException.class)
+                .hasMessage(UserUtils.USERNAME_IN_USE_MESSAGE);
+
+        verify(userAuthProvider, never()).changeUserInfo(any(User.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void update_shouldThrowWhenEmailAlreadyUsedByAnotherUser() {
+        UserUpdateRequest request = userUpdateRequest(EMAIL_NEW, USERNAME_NEW, DISPLAY_NAME_NEW, BIO_NEW);
+        User existing = user(USER_ID_3, KEYCLOAK_ID_ALT, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
+        User another = user(USER_ID_99, "other-kc", EMAIL_NEW, "other-name", DISPLAY_NAME_NEW, BIO_NEW, true);
+
+        when(userRepository.findById(USER_ID_3)).thenReturn(Optional.of(existing));
+        when(userRepository.findByUsernameIgnoreCase(USERNAME_NEW)).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(EMAIL_NEW)).thenReturn(Optional.of(another));
+
+        assertThatThrownBy(() -> userService.update(USER_ID_3, request))
+                .isInstanceOf(AlreadyExistsException.class)
+                .hasMessage(UserUtils.EMAIL_IN_USE_MESSAGE);
+
+        verify(userAuthProvider, never()).changeUserInfo(any(User.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void changeRole_shouldUpdateRoleInProviderAndRepository() {
+        User user = user(USER_ID_7, KEYCLOAK_ID_ALT, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
+        user.setRole(UserRole.USER);
+        UserChangeRoleRequest request = new UserChangeRoleRequest(UserRole.ADMIN.getStringName());
+        UserResponse response = userResponse(USER_ID_7, EMAIL, USERNAME, DISPLAY_NAME, BIO, UserRole.ADMIN, true);
+
+        when(userRepository.findById(USER_ID_7)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toUserResponse(user)).thenReturn(response);
+
+        UserResponse result = userService.changeRole(USER_ID_7, request);
+
+        assertThat(result).isEqualTo(response);
+        assertThat(user.getRole()).isEqualTo(UserRole.ADMIN);
+        verify(userAuthProvider).changeUserRole(KEYCLOAK_ID_ALT, UserRole.USER.getStringName(), UserRole.ADMIN.getStringName());
+    }
+
+    @Test
+    void changeRole_shouldRollbackProviderRoleWhenSaveFails() {
+        User user = user(USER_ID_7, KEYCLOAK_ID_ALT, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
+        user.setRole(UserRole.USER);
+        UserChangeRoleRequest request = new UserChangeRoleRequest(UserRole.ADMIN.getStringName());
+
+        when(userRepository.findById(USER_ID_7)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenThrow(new RuntimeException("db failure"));
+
+        assertThatThrownBy(() -> userService.changeRole(USER_ID_7, request))
+                .isInstanceOf(UpdatingException.class)
+                .hasMessageContaining(UserUtils.ROLE_CHANGING_EXCEPTION_MESSAGE);
+
+        verify(userAuthProvider).changeUserRole(KEYCLOAK_ID_ALT, UserRole.USER.getStringName(), UserRole.ADMIN.getStringName());
+        verify(userAuthProvider).changeUserRole(KEYCLOAK_ID_ALT, UserRole.ADMIN.getStringName(), UserRole.USER.getStringName());
     }
 }

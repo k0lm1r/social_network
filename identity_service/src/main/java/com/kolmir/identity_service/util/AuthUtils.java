@@ -2,10 +2,11 @@ package com.kolmir.identity_service.util;
 
 import java.security.SecureRandom;
 
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserRegisterResponse;
+import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
 
 import lombok.experimental.UtilityClass;
 
@@ -54,5 +55,9 @@ public class AuthUtils {
                 request.displayName(), 
                 UserUtils.getShortBio(request.bio())
         );
+    }
+
+    public RefreshTokenRequest getSafeRefreshTokenRequest (RefreshTokenRequest request) {
+        return new RefreshTokenRequest(REDACTED_MESSAGE);
     }
 }

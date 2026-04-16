@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.mapstruct.Mapper;
 
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 
 @Mapper(componentModel = "spring")
 public interface AuthMapper {

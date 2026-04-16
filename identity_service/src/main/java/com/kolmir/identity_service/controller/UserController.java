@@ -1,14 +1,13 @@
 package com.kolmir.identity_service.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kolmir.identity_service.controller.api.UserControllerApi;
-import com.kolmir.identity_service.dto.UserCreateRequest;
-import com.kolmir.identity_service.dto.UserResponse;
-import com.kolmir.identity_service.dto.UserUpdateRequest;
-import com.kolmir.identity_service.model.UserRole;
+import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
+import com.kolmir.identity_service.dto.user.UserCreateRequest;
+import com.kolmir.identity_service.dto.user.UserResponse;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 import com.kolmir.identity_service.service.UserService;
 import static com.kolmir.identity_service.util.UserUtils.*;
 
@@ -42,7 +41,6 @@ public class UserController implements UserControllerApi {
     
     @Override
     @GetMapping(USER_ID_URL)
-    @PreAuthorize("@securityServiceImpl.isCurrentUserOwner(#id) || hasAnyRole('ADMIN', 'MAIN_ADMIN')")
     public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
@@ -70,7 +68,7 @@ public class UserController implements UserControllerApi {
     @Override
     @PatchMapping(CHANGE_ROLE_URL)
     @PreAuthorize("!@securityServiceImpl.isCurrentUserOwner(#id) && hasRole('MAIN_ADMIN')")
-    public ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestParam UserRole newRole) {
-        return ResponseEntity.ok(userService.changeRole(id, newRole));
+    public ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestBody @Valid UserChangeRoleRequest request) {
+        return ResponseEntity.ok(userService.changeRole(id, request));
     }
 }

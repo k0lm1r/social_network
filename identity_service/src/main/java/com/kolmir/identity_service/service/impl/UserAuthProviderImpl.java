@@ -22,7 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.kolmir.identity_service.dto.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.model.User;

@@ -18,6 +18,7 @@ import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.LOCATION_HEADER;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.PASSWORD;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.REALM;
+import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.REFRESH_TOKEN_VALUE;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.SERVER_URL;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_CREATING_EXCEPTION_500;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.USER_ROLE;
@@ -26,11 +27,19 @@ import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.HTTP_CONFLICT;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.HTTP_CREATED;
 import static com.kolmir.identity_service.testutil.IdentityServiceTestConstants.HTTP_INTERNAL_SERVER_ERROR;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,18 +54,30 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.mockito.InOrder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
-import com.kolmir.identity_service.dto.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.model.User;
 import com.kolmir.identity_service.util.KeycloakConstants;
 
 import jakarta.ws.rs.core.Response;
+
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ExtendWith(MockitoExtension.class)
 class UserAuthProviderImplTest {
@@ -95,8 +116,8 @@ class UserAuthProviderImplTest {
         userAuthProvider.clientId = CLIENT_ID;
         userAuthProvider.clientSecret = CLIENT_SECRET;
 
-        when(keycloak.realm(REALM)).thenReturn(realmResource);
-        when(realmResource.users()).thenReturn(usersResource);
+        lenient().when(keycloak.realm(REALM)).thenReturn(realmResource);
+        lenient().when(realmResource.users()).thenReturn(usersResource);
     }
 
     @Test
@@ -183,5 +204,106 @@ class UserAuthProviderImplTest {
 
         assertThat(representation.isEnabled()).isFalse();
         verify(userResource).update(representation);
+        verify(userResource).logout();
+    }
+
+    @Test
+    void getTokensForUser_shouldCallTokenEndpointWithPasswordGrant() {
+        MockRestServiceServer server = buildMockServer();
+        server.expect(ExpectedCount.once(), requestTo("http://localhost:8080/realms/test-realm/protocol/openid-connect/token"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(content().string(containsString("grant_type=password")))
+                .andExpect(content().string(containsString("client_id=client")))
+                .andExpect(content().string(containsString("client_secret=secret")))
+                .andExpect(content().string(containsString("username=user")))
+                .andExpect(content().string(containsString("password=pass1234")))
+                .andRespond(withSuccess(
+                        "{\"access_token\":\"acc\",\"refresh_token\":\"ref\",\"expires_in\":300,\"refresh_expires_in\":900}",
+                        MediaType.APPLICATION_JSON
+                ));
+
+        Map<String, Object> result = userAuthProvider.getTokensForUser(USERNAME, PASSWORD);
+
+        assertThat(result).containsEntry("access_token", "acc")
+                .containsEntry("refresh_token", "ref");
+        server.verify();
+    }
+
+    @Test
+    void refreshUserToken_shouldCallTokenEndpointWithRefreshGrant() {
+        MockRestServiceServer server = buildMockServer();
+        server.expect(ExpectedCount.once(), requestTo("http://localhost:8080/realms/test-realm/protocol/openid-connect/token"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(content().string(containsString("grant_type=refresh_token")))
+                .andExpect(content().string(containsString("refresh_token=refresh-token-value")))
+                .andRespond(withSuccess(
+                        "{\"access_token\":\"new-access\",\"refresh_token\":\"new-refresh\",\"expires_in\":120,\"refresh_expires_in\":720}",
+                        MediaType.APPLICATION_JSON
+                ));
+
+        Map<String, Object> result = userAuthProvider.refreshUserToken(REFRESH_TOKEN_VALUE);
+
+        assertThat(result).containsEntry("access_token", "new-access")
+                .containsEntry("refresh_token", "new-refresh");
+        server.verify();
+    }
+
+    @Test
+    void deleteUser_shouldDelegateToUsersResource() {
+        userAuthProvider.deleteUser(KEYCLOAK_ID_ALT);
+        verify(usersResource).delete(KEYCLOAK_ID_ALT);
+    }
+
+    @Test
+    void changeUserRole_shouldDeleteOldRoleThenSetNewRole() {
+        RoleRepresentation oldRoleRepresentation = roleRepresentation("USER");
+        RoleRepresentation newRoleRepresentation = roleRepresentation("ADMIN");
+
+        when(realmResource.roles()).thenReturn(rolesResource);
+        when(rolesResource.get(any(String.class))).thenReturn(roleResource);
+        when(roleResource.toRepresentation()).thenReturn(oldRoleRepresentation, newRoleRepresentation);
+        when(usersResource.get(KEYCLOAK_ID_ALT)).thenReturn(userResource);
+        when(userResource.roles()).thenReturn(roleMappingResource);
+        when(roleMappingResource.realmLevel()).thenReturn(roleScopeResource);
+
+        userAuthProvider.changeUserRole(KEYCLOAK_ID_ALT, "USER", "ADMIN");
+
+        InOrder inOrder = inOrder(roleScopeResource);
+        inOrder.verify(roleScopeResource).remove(anyList());
+        inOrder.verify(roleScopeResource).add(anyList());
+    }
+
+    @Test
+    void changeUserRole_shouldRollbackAndRethrowWhenAssigningNewRoleFails() {
+        RoleRepresentation oldRoleRepresentation = roleRepresentation("USER");
+        RoleRepresentation newRoleRepresentation = roleRepresentation("ADMIN");
+
+        when(realmResource.roles()).thenReturn(rolesResource);
+        when(rolesResource.get(any(String.class))).thenReturn(roleResource);
+        when(roleResource.toRepresentation())
+                .thenReturn(oldRoleRepresentation, newRoleRepresentation, newRoleRepresentation, oldRoleRepresentation);
+        when(usersResource.get(KEYCLOAK_ID_ALT)).thenReturn(userResource);
+        when(userResource.roles()).thenReturn(roleMappingResource);
+        when(roleMappingResource.realmLevel()).thenReturn(roleScopeResource);
+        doThrow(new RuntimeException("failed to assign role"))
+                .doNothing()
+                .when(roleScopeResource).add(anyList());
+        doNothing().when(roleScopeResource).remove(anyList());
+
+        assertThatThrownBy(() -> userAuthProvider.changeUserRole(KEYCLOAK_ID_ALT, "USER", "ADMIN"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("failed to assign role");
+
+        verify(roleScopeResource).remove(eq(List.of(oldRoleRepresentation)));
+        verify(roleScopeResource).remove(eq(List.of(newRoleRepresentation)));
+        verify(roleScopeResource).add(eq(List.of(newRoleRepresentation)));
+        verify(roleScopeResource).add(eq(List.of(oldRoleRepresentation)));
+    }
+
+    private MockRestServiceServer buildMockServer() {
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(userAuthProvider, "restTemplate");
+        return MockRestServiceServer.bindTo(restTemplate).build();
     }
 }

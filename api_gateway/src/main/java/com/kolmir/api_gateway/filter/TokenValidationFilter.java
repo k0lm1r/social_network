@@ -3,12 +3,14 @@ package com.kolmir.api_gateway.filter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
 import com.kolmir.api_gateway.filter.util.HeaderSetter;
 import com.kolmir.api_gateway.logger.GatewayLogger;
 
+import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +30,13 @@ public class TokenValidationFilter implements GlobalFilter, Ordered {
         String auth = exchange.getRequest().getHeaders().getFirst(AUTORIZATION_HEADER);
 
         if (auth != null && !auth.isBlank()) {
-            var request = headerSetter.addUserData(exchange.getRequest(), auth);
-            return chain.filter(exchange.mutate().request(request).build());
+            try {
+                var request = headerSetter.addUserData(exchange.getRequest(), auth);
+                return chain.filter(exchange.mutate().request(request).build());
+            } catch (StatusRuntimeException e) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
         }
 
         GatewayLogger.logRoute(exchange);

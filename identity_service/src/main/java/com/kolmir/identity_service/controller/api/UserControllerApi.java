@@ -1,9 +1,9 @@
 package com.kolmir.identity_service.controller.api;
 
-import com.kolmir.identity_service.dto.UserCreateRequest;
-import com.kolmir.identity_service.dto.UserResponse;
-import com.kolmir.identity_service.dto.UserUpdateRequest;
-import com.kolmir.identity_service.model.UserRole;
+import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
+import com.kolmir.identity_service.dto.user.UserCreateRequest;
+import com.kolmir.identity_service.dto.user.UserResponse;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,11 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Tag(name = "Users", description = "User management endpoints")
@@ -27,7 +28,7 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "403",
             description = "Access denied",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<List<UserResponse>> getAll();
@@ -38,7 +39,7 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "404",
             description = "User not found",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<UserResponse> getById(@PathVariable Long id);
@@ -49,15 +50,15 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "400",
             description = "Validation error",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         ),
         @ApiResponse(
             responseCode = "404",
             description = "User not found",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserResponse> updateById(@PathVariable Long id, @RequestBody UserUpdateRequest request);
+    ResponseEntity<UserResponse> updateById(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request);
 
     @Operation(summary = "Create user", description = "Creates a new user")
     @ApiResponses({
@@ -65,10 +66,10 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "400",
             description = "Validation error",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest request);
+    ResponseEntity<UserResponse> create(@RequestBody @Valid UserCreateRequest request);
 
     @Operation(summary = "Disable user", description = "Disables a user by id")
     @ApiResponses({
@@ -76,12 +77,12 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "403",
             description = "Access denied",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         ),
         @ApiResponse(
             responseCode = "404",
             description = "User not found",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
     ResponseEntity<UserResponse> disable(@PathVariable Long id);
@@ -92,13 +93,13 @@ public interface UserControllerApi {
         @ApiResponse(
             responseCode = "403",
             description = "Access denied",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         ),
         @ApiResponse(
             responseCode = "404",
             description = "User not found",
-            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.ErrorResponse.class))
+            content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
-    ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestParam UserRole newRole);
+    ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestBody @Valid UserChangeRoleRequest request);
 }

@@ -6,10 +6,12 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-import com.kolmir.identity_service.dto.UserAuthRequest;
-import com.kolmir.identity_service.dto.UserAuthResponse;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserRegisterResponse;
+import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthRequest;
+import com.kolmir.identity_service.dto.auth.UserAuthResponse;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
+
 import static com.kolmir.identity_service.util.AuthUtils.*;
 
 import java.util.Arrays;
@@ -67,7 +69,7 @@ public class LoggingAspect {
         return switch (result) {
             case UserAuthResponse r -> getSafeAuthResponse(r);
             case UserRegisterResponse r -> getSafeRegisterResponse(r);
-            case String _ -> REDACTED_MESSAGE;
+            case RefreshTokenRequest r -> getSafeRefreshTokenRequest(r);
             case UserRegisterRequest r -> getSafeRegisterRequest(r);
             case UserAuthRequest r -> getSafeAuthRequest(r);
             default -> result;

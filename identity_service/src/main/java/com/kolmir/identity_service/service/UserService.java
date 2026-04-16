@@ -2,11 +2,11 @@ package com.kolmir.identity_service.service;
 
 import java.util.List;
 
-import com.kolmir.identity_service.dto.UserCreateRequest;
-import com.kolmir.identity_service.dto.UserRegisterRequest;
-import com.kolmir.identity_service.dto.UserResponse;
-import com.kolmir.identity_service.dto.UserUpdateRequest;
-import com.kolmir.identity_service.model.UserRole;
+import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
+import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
+import com.kolmir.identity_service.dto.user.UserCreateRequest;
+import com.kolmir.identity_service.dto.user.UserResponse;
+import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 
 
 public interface UserService {
@@ -15,6 +15,6 @@ public interface UserService {
     public UserResponse saveRegisteredUser(UserRegisterRequest request);
     public UserResponse update(Long id, UserUpdateRequest request);
     public UserResponse disable(Long id);
-    public UserResponse changeRole(Long id, UserRole newRole);
+    public UserResponse changeRole(Long id, UserChangeRoleRequest request);
     public UserResponse saveCreatedUser(UserCreateRequest request);
 }
