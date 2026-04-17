@@ -1,12 +1,8 @@
 package com.kolmir.identity_service.util;
 
 import java.security.SecureRandom;
-
-import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
-import com.kolmir.identity_service.dto.auth.UserAuthRequest;
-import com.kolmir.identity_service.dto.auth.UserAuthResponse;
-import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
-import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import lombok.experimental.UtilityClass;
 
@@ -17,7 +13,12 @@ public class AuthUtils {
     public static final String REGISTER_PATH = "/register"; 
     public static final String REFRESH_PATH = "/refresh";
     public static final String REDACTED_MESSAGE = "[REDACTED]";
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+    public static final String CYCLE_MESSAGE = "[CYCLE]";
+    public static final Pattern BEARER = Pattern.compile("(?i)^Bearer\\s+.+$");
+    public static final Set<String> SENSITIVE_KEYS = Set.of(
+        "password", "token", "accessToken", "refreshToken", "secret", "authorization"
+    );
+    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
 
     public static String generatePassword(int length) {
         StringBuilder password = new StringBuilder(length);
@@ -29,35 +30,5 @@ public class AuthUtils {
         }
 
         return password.toString();
-    }
-
-    public UserAuthResponse getSafeAuthResponse(UserAuthResponse response) {
-        return new UserAuthResponse(
-                    REDACTED_MESSAGE, 
-                    response.accessExpiresIn(), 
-                    REDACTED_MESSAGE, response.refreshExpiresIn()
-                );
-    }
-    
-    public UserAuthRequest getSafeAuthRequest(UserAuthRequest request) {
-        return new UserAuthRequest(request.username(), REDACTED_MESSAGE);
-    }
-
-    public UserRegisterResponse getSafeRegisterResponse (UserRegisterResponse response) {
-        return new UserRegisterResponse(getSafeAuthResponse(response.auth()), response.user());
-    }
-
-    public UserRegisterRequest getSafeRegisterRequest (UserRegisterRequest request) {
-        return new UserRegisterRequest (
-                request.email(), 
-                request.username(), 
-                REDACTED_MESSAGE, 
-                request.displayName(), 
-                UserUtils.getShortBio(request.bio())
-        );
-    }
-
-    public RefreshTokenRequest getSafeRefreshTokenRequest (RefreshTokenRequest request) {
-        return new RefreshTokenRequest(REDACTED_MESSAGE);
     }
 }

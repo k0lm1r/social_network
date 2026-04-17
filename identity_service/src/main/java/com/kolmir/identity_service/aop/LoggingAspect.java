@@ -6,23 +6,19 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
-import com.kolmir.identity_service.dto.auth.UserAuthRequest;
-import com.kolmir.identity_service.dto.auth.UserAuthResponse;
-import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
-import com.kolmir.identity_service.dto.auth.UserRegisterResponse;
+import com.kolmir.identity_service.logging.LogSanitizer;
 
-import static com.kolmir.identity_service.util.AuthUtils.*;
-
-import java.util.Arrays;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class LoggingAspect {
+
+    private final LogSanitizer logSanitizer;
 
     @Pointcut("execution(* com.kolmir.identity_service.service..*(..))")
     public void serviceLayer() {}
@@ -35,7 +31,7 @@ public class LoggingAspect {
         String methodName = jp.getSignature().toShortString();
         Object[] args = jp.getArgs();
 
-        log.info("method - {}, args - {}", methodName, protectArgs(args));
+        log.info("method - {}, args - {}", methodName, logSanitizer.mask(args));
 
         long start = System.currentTimeMillis();
 
@@ -46,7 +42,7 @@ public class LoggingAspect {
             if (result == null) {
                 log.info("result - null, {} ms", end - start);
             } else {
-                log.info("result - {}, {} ms", protectData(result), end - start);
+                log.info("result - {}, {} ms", logSanitizer.mask(result), end - start);
             }
 
             return result;
@@ -57,22 +53,5 @@ public class LoggingAspect {
             log.error("exception - {}", t);
             throw t;
         }
-    }
-
-    private Object[] protectArgs(Object[] args) {
-        return Arrays.stream(args)
-                .map(this::protectData)
-                .toArray();
-    }
-
-    private Object protectData(Object result) {
-        return switch (result) {
-            case UserAuthResponse r -> getSafeAuthResponse(r);
-            case UserRegisterResponse r -> getSafeRegisterResponse(r);
-            case RefreshTokenRequest r -> getSafeRefreshTokenRequest(r);
-            case UserRegisterRequest r -> getSafeRegisterRequest(r);
-            case UserAuthRequest r -> getSafeAuthRequest(r);
-            default -> result;
-        };
     }
 }

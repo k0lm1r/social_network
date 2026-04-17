@@ -1,5 +1,7 @@
 package com.kolmir.identity_service.dto.auth;
 
+import com.kolmir.identity_service.logging.Sensitive;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -10,5 +12,5 @@ public record UserAuthRequest (
 
     @NotBlank(message = "{blank}")
     @Size(min = 4, message = "{size}")
-    String password
+    @Sensitive String password
 ) {}

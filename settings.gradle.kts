@@ -8,7 +8,8 @@ val modules = listOf("identity_service",
                     "proto",
                     "eureka_server",
                     "api_gateway",
-                    "logging-common")
+                    "logging-common",
+                    "subsciption_serv")
 
 modules
     .filter { file(it).isDirectory }

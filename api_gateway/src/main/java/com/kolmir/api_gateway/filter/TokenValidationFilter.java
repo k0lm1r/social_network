@@ -11,6 +11,7 @@ import com.kolmir.api_gateway.filter.util.HeaderSetter;
 import com.kolmir.api_gateway.logger.GatewayLogger;
 
 import io.grpc.StatusRuntimeException;
+import io.grpc.Status.Code;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +35,8 @@ public class TokenValidationFilter implements GlobalFilter, Ordered {
                 var request = headerSetter.addUserData(exchange.getRequest(), auth);
                 return chain.filter(exchange.mutate().request(request).build());
             } catch (StatusRuntimeException e) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                HttpStatus status = getCode(e.getStatus().getCode());
+                exchange.getResponse().setStatusCode(status);
                 return exchange.getResponse().setComplete();
             }
         }
@@ -46,5 +48,14 @@ public class TokenValidationFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         return -1;
+    }
+
+    private HttpStatus getCode(Code code) {
+        return switch (code) {
+            case UNAUTHENTICATED -> HttpStatus.UNAUTHORIZED;
+            case PERMISSION_DENIED -> HttpStatus.FORBIDDEN;
+            case UNAVAILABLE, DEADLINE_EXCEEDED -> HttpStatus.SERVICE_UNAVAILABLE;
+            default -> HttpStatus.BAD_GATEWAY;
+        };
     }
 }

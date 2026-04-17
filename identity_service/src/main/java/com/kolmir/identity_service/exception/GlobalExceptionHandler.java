@@ -1,6 +1,7 @@
 package com.kolmir.identity_service.exception;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -14,6 +15,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.kolmir.identity_service.dto.exception.ErrorResponse;
 
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
@@ -70,7 +75,8 @@ public class GlobalExceptionHandler {
         if (status.value() == HttpStatus.UNAUTHORIZED.value()) {
             message = UNAUTHORIZED_EXCEPTION_MESSAGE;
         } else if (e.getResponseBodyAsString().contains(INVALID_GRANT)) {
-            message = USER_DISABLED_MESSAGE;
+            Map<String, Object> response = getErrorBody(e.getResponseBodyAsString());
+            message = response.get(ERROR_DESCRIPTION).toString();
         } else 
             message = e.getResponseBodyAsString();
         return new ResponseEntity<>(getErrorResponse(message), status);
@@ -84,5 +90,14 @@ public class GlobalExceptionHandler {
 
     private ErrorResponse getErrorResponse(String message) {
         return new ErrorResponse(message, LocalDateTime.now());
+    }
+
+    private Map<String, Object> getErrorBody(String errorBody) {
+        ObjectMapper mapper = new JsonMapper();
+        try {
+            return mapper.readValue(errorBody, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            return Map.of();
+        }
     }
 }
