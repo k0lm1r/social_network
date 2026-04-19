@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: subscription-service
+
+server:
+  port: 8083
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - metrics  
+
+info:
+  app:
+    name: Subscription service
+    description: Social interaction processing service
