@@ -8,4 +8,4 @@ public record LikeDislikeResponse (
     Action action,
     Long userId,
     Long postId
-) {}
+) implements InteractionEventResponse {}

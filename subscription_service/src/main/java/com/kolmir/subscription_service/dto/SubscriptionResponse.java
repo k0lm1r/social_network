@@ -7,5 +7,5 @@ public record SubscriptionResponse (
     String id,
     Action action,
     Long userId,
-    Long tartgetUserId
-) {}
+    Long targetUserId
+) implements InteractionEventResponse {}

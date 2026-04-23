@@ -1,6 +1,7 @@
 package com.kolmir.subscription_service.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +23,9 @@ public class Reaction {
     @EqualsAndHashCode.Exclude
     private String id;
     
+    @Indexed(unique = true)
     private Long postId;
-    private Integer likeCount;
-    private Integer dislikeCount;
+    
+    private Integer likeCount = 0;
+    private Integer dislikeCount = 0;
 }

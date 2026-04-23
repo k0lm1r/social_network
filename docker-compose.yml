@@ -17,6 +17,20 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+  
+  subscription-db:
+    image: mongo:8.2.7
+    container_name: subscription-db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${SUBSCRIPTION_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${SUBSCRIPTION_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - subscription_data:/data/db
     
   keycloak:
     image: quay.io/keycloak/keycloak:26.5
@@ -86,4 +100,5 @@ services:
 volumes:
   postgres_data:
   app-logs:
+  subscription_data:
   
