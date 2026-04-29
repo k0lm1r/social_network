@@ -11,6 +11,6 @@ import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.
 
 @FeignClient(name = "identity-service")
 public interface UserClient {
-    @GetMapping(USER_ID_URL)
+    @GetMapping(GET_USER_URL)
     Map<Object, Object> getUserById(@PathVariable Long userId);
 }

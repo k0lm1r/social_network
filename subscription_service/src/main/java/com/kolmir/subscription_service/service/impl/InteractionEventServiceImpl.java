@@ -11,8 +11,10 @@ import com.kolmir.subscription_service.exception.AlreadyExistsException;
 import com.kolmir.subscription_service.mapper.InteractionEventMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.InteractionEvent;
+import com.kolmir.subscription_service.openfeign.service.UserExistenceService;
 import com.kolmir.subscription_service.repository.InteractionEventRepository;
 import com.kolmir.subscription_service.service.InteractionEventService;
+
 import static com.kolmir.subscription_service.util.InteractionEventUtil.*;
 
 import jakarta.ws.rs.NotFoundException;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class InteractionEventServiceImpl implements InteractionEventService {
     private final InteractionEventRepository repository;
     private final InteractionEventMapper mapper;
+    private final UserExistenceService userExistenceService;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,6 +52,7 @@ public class InteractionEventServiceImpl implements InteractionEventService {
 
     @Override
     public InteractionEventResponse save(CreateInteractionEventRequest request) {
+        userExistenceService.validateUserExists(request.userId());
         if (isEventNotUnique(request))
             throw new AlreadyExistsException(EVENT_ALREADY_EXISTS_MESSAGE);
         return mapper.toResponse(repository.save(mapper.toInteractionEvent(request)));

@@ -37,7 +37,7 @@ services:
           "CMD-SHELL",
           "mongosh --quiet --username ${SUBSCRIPTION_USERNAME} --password ${SUBSCRIPTION_PASSWORD} --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1",
         ]
-      interval: 10s
+      interval: 120s
       timeout: 5s
       retries: 10
       start_period: 10s

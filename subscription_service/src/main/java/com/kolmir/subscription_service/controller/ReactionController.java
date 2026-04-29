@@ -14,6 +14,8 @@ import com.kolmir.subscription_service.dto.reaction.AddReactionRequest;
 import com.kolmir.subscription_service.dto.reaction.ReactionResponse;
 import com.kolmir.subscription_service.service.ReactionService;
 
+import jakarta.validation.Valid;
+
 import static com.kolmir.subscription_service.util.ReactionUtil.*;
 
 import java.util.Collection;
@@ -34,7 +36,7 @@ public class ReactionController {
     }
 
     @PatchMapping(REACTIONS_FOR_POST_URL)
-    public ResponseEntity<ReactionResponse> addReaction(@RequestBody AddReactionRequest request) {
+    public ResponseEntity<ReactionResponse> addReaction(@Valid @RequestBody AddReactionRequest request) {
         return ResponseEntity.ok(reactionService.addReaction(request));
     }
 

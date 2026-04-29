@@ -2,6 +2,7 @@ package com.kolmir.identity_service.config;
 
 import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.security.KeycloakAuthoritiesConverter;
+import static com.kolmir.identity_service.util.IdentityServiceConstants.*;
 import static com.kolmir.identity_service.util.UserUtils.*;
 import static com.kolmir.identity_service.util.AuthUtils.AUTH_PATH;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +22,10 @@ public class SpringSecurityConfig {
                 .requestMatchers(
                     AUTH_PATH + "/**",
                     USER_MAIN_URL + USER_ID_URL,
-                    "/actuator/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
+                    ACTUATOR_URL,
+                    API_DOCS_URL,
+                    SWAGGER_UI_URL,
+                    SWAGGER_UI_HTML_URL
                 ).permitAll()
                 .requestMatchers(CHANGE_ROLE_URL).hasRole(UserRole.MAIN_ADMIN.getStringName())
                 .requestMatchers(USER_DISABLE_URL, USER_MAIN_URL).hasAnyRole(

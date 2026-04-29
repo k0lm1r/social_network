@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(SUBSCRIPTION_BASE_URL)
+@RequestMapping(SUBSCRIPTION_MAIN_URL)
 public class SubscriptionLinkController {
     private final SubscriptionLinkService service;
 

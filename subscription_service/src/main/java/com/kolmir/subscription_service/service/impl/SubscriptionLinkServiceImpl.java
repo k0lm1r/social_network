@@ -8,6 +8,7 @@ import com.kolmir.subscription_service.dto.subscription.FollowListResponse;
 import com.kolmir.subscription_service.dto.subscription.SubscriptionLinkResponse;
 import com.kolmir.subscription_service.mapper.SubscriptionLinkMapper;
 import com.kolmir.subscription_service.model.SubscriptionLink;
+import com.kolmir.subscription_service.openfeign.service.UserExistenceService;
 import com.kolmir.subscription_service.repository.SubscriptionLinkRepository;
 import com.kolmir.subscription_service.security.SecurityUtils;
 import com.kolmir.subscription_service.service.SubscriptionLinkService;
@@ -23,9 +24,11 @@ import lombok.RequiredArgsConstructor;
 public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     private final SubscriptionLinkRepository repository;
     private final SubscriptionLinkMapper mapper;
+    private final UserExistenceService userExistenceService;
 
     @Override
     public SubscriptionLinkResponse follow(Long followingId) {
+        userExistenceService.validateUserExists(followingId);
         return mapper.toSubscriptionLinkResponse(
             repository.save(
                 mapper.toSubscriptionLink(followingId)
@@ -43,6 +46,7 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     @Override
     @Transactional(readOnly = true)
     public FollowCountResponse getFollowersCountForUser(Long userId) {
+        userExistenceService.validateUserExists(userId);
         return mapper.toFollowCountResponse (
             repository.countByFollowingId(userId)
         );
@@ -51,6 +55,7 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     @Override
     @Transactional(readOnly = true)
     public FollowListResponse getFollowersForUser(Long userId) {
+        userExistenceService.validateUserExists(userId);
         return mapper.toFollowersListResponse(
             repository.findByFollowingId(userId)
         );
@@ -59,6 +64,7 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     @Override
     @Transactional(readOnly = true)
     public FollowCountResponse getFollowingsCountForUser(Long userId) {
+        userExistenceService.validateUserExists(userId);
         return mapper.toFollowCountResponse(
             repository.countByFollowerId(userId)
         );
@@ -67,6 +73,7 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     @Override
     @Transactional(readOnly = true)
     public FollowListResponse getFollowingsForUser(Long userId) {
+        userExistenceService.validateUserExists(userId);
         return mapper.toFollowingsListResponse(
             repository.findByFollowerId(userId)
         );

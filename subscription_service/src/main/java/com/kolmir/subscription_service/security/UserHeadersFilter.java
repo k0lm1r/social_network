@@ -2,7 +2,6 @@ package com.kolmir.subscription_service.security;
 
 import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +29,7 @@ public class UserHeadersFilter extends OncePerRequestFilter {
         String roleHeader = request.getHeader(ROLE_HEADER);
 
         if (!isUserDataValid(idHeader, roleHeader)) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), INVALID_USER_DATA_MESSAGE);
-            return;
+            filterChain.doFilter(request, response);
         }
 
         Long userId = Long.valueOf(idHeader);
