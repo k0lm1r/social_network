@@ -3,8 +3,8 @@ package com.kolmir.subscription_service.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kolmir.subscription_service.dto.CreateInteractionEventRequest;
-import com.kolmir.subscription_service.dto.InteractionEventResponse;
+import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
+import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 import com.kolmir.subscription_service.service.InteractionEventService;
 
 import lombok.RequiredArgsConstructor;

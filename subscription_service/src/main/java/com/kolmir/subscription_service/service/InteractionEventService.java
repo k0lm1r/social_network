@@ -2,8 +2,8 @@ package com.kolmir.subscription_service.service;
 
 import java.util.List;
 
-import com.kolmir.subscription_service.dto.CreateInteractionEventRequest;
-import com.kolmir.subscription_service.dto.InteractionEventResponse;
+import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
+import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 
 
 public interface InteractionEventService {

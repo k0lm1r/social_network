@@ -20,6 +20,7 @@ public class SpringSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     AUTH_PATH + "/**",
+                    USER_MAIN_URL + USER_ID_URL,
                     "/actuator/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",

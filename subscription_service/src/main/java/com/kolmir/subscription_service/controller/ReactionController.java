@@ -4,14 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kolmir.subscription_service.dto.AddReactionRequest;
-import com.kolmir.subscription_service.dto.DeleteReactionRequest;
-import com.kolmir.subscription_service.dto.ReactionResponse;
+import com.kolmir.subscription_service.dto.reaction.AddReactionRequest;
+import com.kolmir.subscription_service.dto.reaction.ReactionResponse;
 import com.kolmir.subscription_service.service.ReactionService;
 
 import static com.kolmir.subscription_service.util.ReactionUtil.*;
@@ -39,8 +39,8 @@ public class ReactionController {
     }
 
     @DeleteMapping(REACTIONS_FOR_POST_URL)
-    public ResponseEntity<Void> deleteReaction(@RequestBody DeleteReactionRequest request) {
-        reactionService.deleteReaction(request);
+    public ResponseEntity<Void> deleteReaction(@PathVariable Long postId) {
+        reactionService.deleteReaction(postId);
         return ResponseEntity.noContent().build();
     }
 }

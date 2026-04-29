@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.kolmir.subscription_service.dto.ErrorResponse;
+import com.kolmir.subscription_service.dto.exception.ErrorResponse;
 
 
 @RestControllerAdvice
@@ -23,6 +23,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> exceptionHandler (IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler (ExternalServiceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(getErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

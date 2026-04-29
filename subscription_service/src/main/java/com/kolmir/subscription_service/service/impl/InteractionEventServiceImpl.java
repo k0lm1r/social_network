@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kolmir.subscription_service.dto.CreateInteractionEventRequest;
-import com.kolmir.subscription_service.dto.InteractionEventResponse;
+import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
+import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 import com.kolmir.subscription_service.exception.AlreadyExistsException;
 import com.kolmir.subscription_service.mapper.InteractionEventMapper;
 import com.kolmir.subscription_service.model.Action;
@@ -60,6 +60,7 @@ public class InteractionEventServiceImpl implements InteractionEventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public InteractionEventResponse getReacitonFromUser(Long userId, Long postId) {
         InteractionEvent event = repository.findByPostIdAndUserId(postId, userId).orElseThrow(
             () -> new NotFoundException(EVENT_NOT_FOUND_MESSAGE)

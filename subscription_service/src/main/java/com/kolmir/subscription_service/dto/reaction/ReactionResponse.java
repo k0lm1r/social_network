@@ -1,4 +1,4 @@
-package com.kolmir.subscription_service.dto;
+package com.kolmir.subscription_service.dto.reaction;
 
 
 public record ReactionResponse (

@@ -8,15 +8,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kolmir.subscription_service.dto.AddReactionRequest;
-import com.kolmir.subscription_service.dto.DeleteReactionRequest;
-import com.kolmir.subscription_service.dto.LikeDislikeResponse;
-import com.kolmir.subscription_service.dto.ReactionResponse;
+import com.kolmir.subscription_service.dto.event.LikeDislikeResponse;
+import com.kolmir.subscription_service.dto.reaction.AddReactionRequest;
+import com.kolmir.subscription_service.dto.reaction.ReactionResponse;
 import com.kolmir.subscription_service.factory.ReactionFactory;
 import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.Reaction;
 import com.kolmir.subscription_service.repository.ReactionRepository;
+import com.kolmir.subscription_service.security.SecurityUtils;
 import com.kolmir.subscription_service.service.InteractionEventService;
 import com.kolmir.subscription_service.service.ReactionService;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +37,14 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public ReactionResponse deleteReaction(DeleteReactionRequest request) {
+    public ReactionResponse deleteReaction(Long postId) {
         LikeDislikeResponse event = (LikeDislikeResponse)interactionEventService
-            .getReacitonFromUser(request.userId(), request.postId());
-        return changeReactionsCount(request.postId(), event.action(), -1);
+            .getReacitonFromUser(SecurityUtils.getCurrentUser().id(), postId);
+        return changeReactionsCount(postId, event.action(), -1);
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Collection<ReactionResponse> getReactionsForAllPosts(Set<Long> postIds) {
         Map<Long, ReactionResponse> posts = repository.findByPostIdIn(postIds).stream()
             .collect(Collectors.toMap(Reaction::getPostId, mapper::toResponse));

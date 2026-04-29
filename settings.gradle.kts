@@ -14,3 +14,9 @@ val modules = listOf("identity_service",
 modules
     .filter { file(it).isDirectory }
     .forEach { include(":$it") }
+
+include(":auth-contract")
+project(":auth-contract").projectDir = file("common/auth-contract")
+
+include(":auth-spring-security")
+project(":auth-spring-security").projectDir = file("common/auth-spring-security")

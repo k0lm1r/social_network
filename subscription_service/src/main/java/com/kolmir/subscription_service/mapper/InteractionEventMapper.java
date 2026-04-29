@@ -5,10 +5,10 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import com.kolmir.subscription_service.dto.CreateInteractionEventRequest;
-import com.kolmir.subscription_service.dto.InteractionEventResponse;
-import com.kolmir.subscription_service.dto.LikeDislikeResponse;
-import com.kolmir.subscription_service.dto.SubscriptionResponse;
+import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
+import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
+import com.kolmir.subscription_service.dto.event.LikeDislikeResponse;
+import com.kolmir.subscription_service.dto.event.SubscriptionResponse;
 import com.kolmir.subscription_service.model.InteractionEvent;
 
 @Mapper (

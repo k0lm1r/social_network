@@ -1,4 +1,4 @@
-package com.kolmir.subscription_service.dto;
+package com.kolmir.subscription_service.dto.exception;
 
 import java.time.LocalDateTime;
 
