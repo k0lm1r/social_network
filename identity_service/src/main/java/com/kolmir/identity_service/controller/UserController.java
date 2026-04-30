@@ -72,5 +72,9 @@ public class UserController implements UserControllerApi {
         return ResponseEntity.ok(userService.changeRole(id, request));
     }
 
+    @GetMapping(IS_USER_EXISTS_URL)
+    public Boolean isUserExists(@PathVariable Long id) {
+        return userService.isUserExists(id);
+    }
     
 }

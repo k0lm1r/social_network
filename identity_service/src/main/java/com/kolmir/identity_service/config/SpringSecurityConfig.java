@@ -22,6 +22,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(
                     AUTH_PATH + "/**",
                     USER_MAIN_URL + USER_ID_URL,
+                    USER_MAIN_URL + IS_USER_EXISTS_URL,
                     ACTUATOR_URL,
                     API_DOCS_URL,
                     SWAGGER_UI_URL,

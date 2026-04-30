@@ -3,8 +3,9 @@ spring:
     name: subscription-service
   mongodb:
     uri: mongodb://${SUBSCRIPTION_USERNAME}:${SUBSCRIPTION_PASSWORD}@${SUBSCRIPTION_HOST:localhost}:${SUBSCRIPTION_PORT:27017}/${SUBSCRIPTION_DBNAME:subscription_db}
+    authentication-database: admin
   data.mongodb:
-      auto-index-creation: true
+    auto-index-creation: true
 
 server:
   port: 8083

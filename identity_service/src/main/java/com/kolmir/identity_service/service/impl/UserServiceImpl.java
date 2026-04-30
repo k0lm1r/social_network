@@ -109,6 +109,11 @@ public class UserServiceImpl implements UserService {
             throw new UpdatingException(ROLE_CHANGING_EXCEPTION_MESSAGE + e.getMessage());
         }
     }
+    
+    @Override
+    public Boolean isUserExists(Long id) {
+        return userRepository.existsById(id);
+    }
 
     private User getUserById(Long id) {
         User user = userRepository.findById(id)
@@ -129,5 +134,4 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
-
 }
