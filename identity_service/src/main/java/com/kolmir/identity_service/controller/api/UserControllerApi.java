@@ -13,7 +13,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +32,7 @@ public interface UserControllerApi {
             content = @Content(schema = @Schema(implementation = com.kolmir.identity_service.dto.exception.ErrorResponse.class))
         )
     })
-    ResponseEntity<List<UserResponse>> getAll();
+    ResponseEntity<Page<UserResponse>> getAll(Pageable pageable);
 
     @Operation(summary = "Get user by id", description = "Returns a user by id")
     @ApiResponses({

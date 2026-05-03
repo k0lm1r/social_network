@@ -23,7 +23,7 @@ import lombok.ToString;
 public class User {
     @Id
     @EqualsAndHashCode.Exclude
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @EqualsAndHashCode.Exclude

@@ -1,8 +1,9 @@
 package com.kolmir.identity_service.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +39,8 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAll() {
-        return userMapper.toResponses(userRepository.findAll());
+    public Page<UserResponse> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
 
     @Override

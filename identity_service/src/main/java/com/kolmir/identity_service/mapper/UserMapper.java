@@ -1,8 +1,6 @@
 package com.kolmir.identity_service.mapper;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -38,8 +36,6 @@ public interface UserMapper {
 
     @Mapping(target = "password", expression = "java(AuthUtils.generatePassword(8))")
     public UserRegisterRequest toUserRegisterRequest(UserCreateRequest request);
-
-    public List<UserResponse> toResponses(List<User> users);
 
     @AfterMapping
     public default void setRegistrationTime(UserRegisterRequest request, @MappingTarget User user) {

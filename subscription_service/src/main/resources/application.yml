@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: subscription-service
+  mongodb:
+    uri: mongodb://${SUBSCRIPTION_USERNAME}:${SUBSCRIPTION_PASSWORD}@${SUBSCRIPTION_HOST:localhost}:${SUBSCRIPTION_PORT:27017}/${SUBSCRIPTION_DBNAME:subscription_db}
+    auto-index-creation: true
+
+server:
+  port: 8083
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - metrics
+
+info:
+  app:
+    name: Subscription service
+    description: Social interaction processing service

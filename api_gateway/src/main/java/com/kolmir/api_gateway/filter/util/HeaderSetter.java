@@ -18,6 +18,7 @@ public class HeaderSetter {
     public ServerHttpRequest addUserData(ServerHttpRequest request, String jwt) {
         UserResponse userData = tokenValidationService.getUserFromToken(jwt);
         return request.mutate()
+            .header(ID_HEADER, String.valueOf(userData.getId()))
             .header(USERNAME_HEADER, userData.getUsername())
             .header(EMAIL_HEADER, userData.getEmail())
             .header(ROLE_HEADER, userData.getRole())

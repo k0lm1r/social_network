@@ -17,6 +17,30 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+  
+  subscription-db:
+    image: mongo:8.2.7
+    container_name: subscription-db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${SUBSCRIPTION_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${SUBSCRIPTION_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - subscription_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --username ${SUBSCRIPTION_USERNAME} --password ${SUBSCRIPTION_PASSWORD} --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     
   keycloak:
     image: quay.io/keycloak/keycloak:26.5
@@ -82,8 +106,26 @@ services:
       - .env
     volumes:
       - ./app-logs/api-gateway:/app/logs
+
+  subscription-service:
+    build:
+      context: .
+      dockerfile: ./subscription_service/Dockerfile
+    container_name: subscription-service
+    depends_on:
+      eureka: 
+        condition: service_started
+      subscription-db:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    volumes:
+      - ./app-logs/subscription-service:/app/logs
   
 volumes:
   postgres_data:
   app-logs:
+  subscription_data:
   
