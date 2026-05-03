@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
 import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 import com.kolmir.subscription_service.exception.AlreadyExistsException;
+import com.kolmir.subscription_service.exception.NotFoundException;
 import com.kolmir.subscription_service.mapper.InteractionEventMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.InteractionEvent;
@@ -17,7 +18,6 @@ import com.kolmir.subscription_service.service.InteractionEventService;
 
 import static com.kolmir.subscription_service.util.InteractionEventUtil.*;
 
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 
@@ -72,12 +72,20 @@ public class InteractionEventServiceImpl implements InteractionEventService {
         return mapper.toResponse(event);
     }
     
+    @Override
+    @Transactional(readOnly = true)
+    public boolean userHasReaction(Long userId, Long postId) {
+        return repository.existsByUserIdAndPostId(userId, postId);
+    }
+
+    private boolean isUserSubscriber (Long userId, Long targetUserId) {
+        return repository.existsByUserIdAndTargetUserId(userId, targetUserId);
+    }
+
     private boolean isEventNotUnique(CreateInteractionEventRequest request) {
         return switch(Action.valueOf(request.action())) {
-            case LIKE, DISLIKE -> 
-                repository.existsByUserIdAndPostId(request.userId(), request.postId());
-            case SUBSCRIBE, UNSUBSCRIBE -> 
-                repository.existsByUserIdAndTargetUserId(request.userId(), request.targetUserId());
+            case LIKE, DISLIKE -> userHasReaction(request.userId(), request.postId());
+            case SUBSCRIBE, UNSUBSCRIBE -> isUserSubscriber(request.userId(), request.targetUserId());
         };
     }
 }

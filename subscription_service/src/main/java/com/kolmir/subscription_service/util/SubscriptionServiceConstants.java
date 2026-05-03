@@ -14,6 +14,7 @@ public class SubscriptionServiceConstants {
     public static final String ADMIN_ROLE = "ADMIN";
     public static final String USER_ROLE = "USER";
     public static final String MAIN_ADMIN_ROLE = "MAIN_ADMIN";
+    public static final String ROLE = "ROLE_";
     public static final String INVALID_USER_DATA_MESSAGE = "Invalid user data headers";
     public static final String IS_USER_EXISTS_URL = "/api/users/{id}/exists";
     public static final String USER_NOT_EXISTS_MESSAGE = "User with this id does not exists";

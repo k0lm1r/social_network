@@ -18,12 +18,12 @@ public interface ReactionMapper {
     public ReactionResponse toResponse(Reaction reaction);
     public Reaction toReaction(AddReactionRequest request);
 
-    public default CreateInteractionEventRequest toCreateEventRequest(AddReactionRequest request) {
+    public default CreateInteractionEventRequest toCreateEventRequest(AddReactionRequest request, Long postId) {
         return new CreateInteractionEventRequest(
             request.action(), 
             SecurityUtils.getCurrentUser().id(), 
             null,
-            request.postId()
+            postId
         );
     }
 }

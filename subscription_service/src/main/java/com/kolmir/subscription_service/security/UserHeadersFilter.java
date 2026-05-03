@@ -39,7 +39,7 @@ public class UserHeadersFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                             user, 
                             null, 
-                            List.of(new SimpleGrantedAuthority(user.role()))
+                            List.of(new SimpleGrantedAuthority(ROLE + user.role()))
                         );
 
         SecurityContextHolder.getContext().setAuthentication(auth);

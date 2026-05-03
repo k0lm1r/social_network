@@ -10,5 +10,5 @@ import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.
 @FeignClient(name = "identity-service")
 public interface UserClient {
     @GetMapping(IS_USER_EXISTS_URL)
-    public Boolean isUserExistsById(@PathVariable Long userId);
+    public Boolean isUserExistsById(@PathVariable Long id);
 }

@@ -30,12 +30,12 @@ public class SpringSecurityConfig {
             .addFilterBefore(userHeadersFilter, AnonymousAuthenticationFilter.class)
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, SUBSCRIPTION_MAIN_URL + FOLLOW_URL, POST_MAIN_URL + REACTIONS_FOR_POST_URL).authenticated()
+                .requestMatchers(HttpMethod.POST, SUBSCRIPTION_MAIN_URL + FOLLOW_URL, POST_MAIN_URL + POST_ID_URL).authenticated()
                 .requestMatchers(HttpMethod.DELETE, SUBSCRIPTION_MAIN_URL + UNFOLLOW_URL).authenticated()
-                .requestMatchers(HttpMethod.PATCH, POST_MAIN_URL + REACTIONS_FOR_POST_URL).authenticated()
+                .requestMatchers(HttpMethod.PATCH, POST_MAIN_URL + POST_ID_URL).authenticated()
                 .requestMatchers(
-                    SUBSCRIPTION_MAIN_URL + "/**",
-                    POST_MAIN_URL + "/**"
+                    SUBSCRIPTION_MAIN_URL + "**",
+                    POST_MAIN_URL + "**"
                 ).permitAll()
                 .requestMatchers(EVENT_MAIN_URL + "/**").hasAnyRole(
                     ADMIN_ROLE,

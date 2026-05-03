@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kolmir.subscription_service.dto.subscription.FollowCountResponse;
 import com.kolmir.subscription_service.dto.subscription.FollowListResponse;
 import com.kolmir.subscription_service.dto.subscription.SubscriptionLinkResponse;
+import com.kolmir.subscription_service.exception.NotFoundException;
 import com.kolmir.subscription_service.mapper.SubscriptionLinkMapper;
 import com.kolmir.subscription_service.model.SubscriptionLink;
 import com.kolmir.subscription_service.openfeign.service.UserExistenceService;
@@ -14,7 +15,6 @@ import com.kolmir.subscription_service.security.SecurityUtils;
 import com.kolmir.subscription_service.service.SubscriptionLinkService;
 import static com.kolmir.subscription_service.util.SubscriptionLinkUtil.*;
 
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 
@@ -38,7 +38,7 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
 
     @Override
     public void unfollow(Long followingId) {
-        Long currentUserId = SecurityUtils.getCurrentUser().id();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         SubscriptionLink link = getByFollowerAndFollowingId(currentUserId, followingId);
         repository.delete(link);
     }

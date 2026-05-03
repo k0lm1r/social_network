@@ -16,7 +16,7 @@ public class ActionValidator implements ConstraintValidator<ValidAction, String>
             try {
                 Action.valueOf(value);
                 return true;
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 return false;
             }
         }

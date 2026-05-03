@@ -30,17 +30,17 @@ import lombok.RequiredArgsConstructor;
 public class ReactionController {
     private final ReactionService reactionService;
 
-    @GetMapping(REACTIONS_URL)
+    @GetMapping
     public ResponseEntity<Collection<ReactionResponse>> getReactionsForPosts(@RequestParam Set<Long> postIds) {
         return ResponseEntity.ok(reactionService.getReactionsForAllPosts(postIds));
     }
 
-    @PatchMapping(REACTIONS_FOR_POST_URL)
-    public ResponseEntity<ReactionResponse> addReaction(@Valid @RequestBody AddReactionRequest request) {
-        return ResponseEntity.ok(reactionService.addReaction(request));
+    @PatchMapping(POST_ID_URL)
+    public ResponseEntity<ReactionResponse> addReaction(@Valid @RequestBody AddReactionRequest request, @PathVariable Long postId) {
+        return ResponseEntity.ok(reactionService.addReaction(request, postId));
     }
 
-    @DeleteMapping(REACTIONS_FOR_POST_URL)
+    @DeleteMapping(POST_ID_URL)
     public ResponseEntity<Void> deleteReaction(@PathVariable Long postId) {
         reactionService.deleteReaction(postId);
         return ResponseEntity.noContent().build();

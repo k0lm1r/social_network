@@ -14,4 +14,8 @@ public class SecurityUtils {
             .getAuthentication()
             .getPrincipal();
     }
+
+    public static Long getCurrentUserId() {
+        return getCurrentUser().id();
+    }
 }

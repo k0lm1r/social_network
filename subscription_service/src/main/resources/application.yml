@@ -2,8 +2,7 @@ spring:
   application:
     name: subscription-service
   mongodb:
-    uri: mongodb://${SUBSCRIPTION_USERNAME}:${SUBSCRIPTION_PASSWORD}@${SUBSCRIPTION_HOST:localhost}:${SUBSCRIPTION_PORT:27017}/${SUBSCRIPTION_DBNAME:subscription_db}
-    authentication-database: admin
+    uri: mongodb://${SUBSCRIPTION_USERNAME}:${SUBSCRIPTION_PASSWORD}@${SUBSCRIPTION_HOST:localhost}:${SUBSCRIPTION_PORT:27017}/${SUBSCRIPTION_DBNAME:subscription_db}?authSource=admin
   data.mongodb:
     auto-index-creation: true
 
