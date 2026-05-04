@@ -1,6 +1,6 @@
 package com.kolmir.identity_service.config;
 
-import com.kolmir.identity_service.model.UserRole;
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.security.KeycloakAuthoritiesConverter;
 import static com.kolmir.identity_service.util.IdentityServiceConstants.*;
 import static com.kolmir.identity_service.util.UserUtils.*;

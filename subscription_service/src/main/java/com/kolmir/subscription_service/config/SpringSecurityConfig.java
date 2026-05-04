@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
-import com.kolmir.subscription_service.security.UserHeadersFilter;
+import com.kolmir.security.filter.UserHeadersFilter;
 
 import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.*;
 
@@ -34,8 +34,8 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, SUBSCRIPTION_MAIN_URL + UNFOLLOW_URL).authenticated()
                 .requestMatchers(HttpMethod.PATCH, POST_MAIN_URL + POST_ID_URL).authenticated()
                 .requestMatchers(
-                    SUBSCRIPTION_MAIN_URL + "**",
-                    POST_MAIN_URL + "**"
+                    SUBSCRIPTION_MAIN_URL + "/**",
+                    POST_MAIN_URL + "/**"
                 ).permitAll()
                 .requestMatchers(EVENT_MAIN_URL + "/**").hasAnyRole(
                     ADMIN_ROLE,

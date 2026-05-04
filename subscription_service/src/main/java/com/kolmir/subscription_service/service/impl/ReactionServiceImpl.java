@@ -16,7 +16,7 @@ import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.Reaction;
 import com.kolmir.subscription_service.repository.ReactionRepository;
-import com.kolmir.subscription_service.security.SecurityUtils;
+import com.kolmir.security.provider.CurrentUserProvider;
 import com.kolmir.subscription_service.service.InteractionEventService;
 import com.kolmir.subscription_service.service.ReactionService;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +29,22 @@ public class ReactionServiceImpl implements ReactionService {
     private final ReactionRepository repository;
     private final ReactionMapper mapper;
     private final InteractionEventService interactionEventService;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public ReactionResponse addReaction(AddReactionRequest request, Long postId) {
-        if (interactionEventService.userHasReaction(SecurityUtils.getCurrentUserId(), postId))
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (interactionEventService.userHasReaction(currentUserId, postId))
             deleteReaction(postId);
         
-        interactionEventService.save(mapper.toCreateEventRequest(request, postId));
+        interactionEventService.save(mapper.toCreateEventRequest(request, postId, currentUserId));
         return changeReactionsCount(postId, Action.valueOf(request.action()), 1);
     }
 
     @Override
     public ReactionResponse deleteReaction(Long postId) {
         LikeDislikeResponse event = (LikeDislikeResponse)interactionEventService
-            .getReacitonFromUser(SecurityUtils.getCurrentUserId(), postId);
+            .getReacitonFromUser(currentUserProvider.getCurrentUserId(), postId);
         interactionEventService.delete(event.id());
         return changeReactionsCount(postId, event.action(), -1);
     }

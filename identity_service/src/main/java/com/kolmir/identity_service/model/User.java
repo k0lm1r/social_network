@@ -1,6 +1,9 @@
 package com.kolmir.identity_service.model;
 
 import java.time.LocalDateTime;
+
+import com.kolmir.auth.model.UserRole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

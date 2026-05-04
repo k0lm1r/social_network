@@ -6,8 +6,8 @@ import com.kolmir.identity_service.dto.auth.UserAuthResponse;
 import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.dto.user.UserResponse;
 import com.kolmir.identity_service.dto.user.UserUpdateRequest;
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 
 import lombok.experimental.UtilityClass;
 

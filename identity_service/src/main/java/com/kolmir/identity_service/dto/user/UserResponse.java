@@ -1,6 +1,7 @@
 package com.kolmir.identity_service.dto.user;
 
-import com.kolmir.identity_service.model.UserRole;
+import com.kolmir.auth.model.UserRole;
+
 
 public record UserResponse(
     Long id,
@@ -10,5 +11,4 @@ public record UserResponse(
     String bio,
     UserRole role,
     Boolean isEnabled
-) {
-}
+) {}

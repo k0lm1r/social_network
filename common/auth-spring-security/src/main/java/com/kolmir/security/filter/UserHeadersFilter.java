@@ -1,17 +1,17 @@
-package com.kolmir.subscription_service.security;
+package com.kolmir.security.filter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.kolmir.subscription_service.model.CurrentUser;
-
-import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.*;
+import com.kolmir.auth.model.CurrentUser;
+import com.kolmir.security.util.CurrentUserUtil;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,35 +25,20 @@ public class UserHeadersFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String idHeader = request.getHeader(ID_HEADER);
-        String roleHeader = request.getHeader(ROLE_HEADER);
 
-        if (!isUserDataValid(idHeader, roleHeader)) {
+        Optional<CurrentUser> optionalUser = CurrentUserUtil.extractCurrentUser(request);
+        if (optionalUser.isEmpty())
             filterChain.doFilter(request, response);
-        }
 
-        Long userId = Long.valueOf(idHeader);
-        CurrentUser user = new CurrentUser(userId, roleHeader);
-
+        CurrentUser currentUser = optionalUser.get();
         UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                            user, 
+                            currentUser, 
                             null, 
-                            List.of(new SimpleGrantedAuthority(ROLE + user.role()))
+                            List.of(new SimpleGrantedAuthority("ROLE_" + currentUser.role()))
                         );
 
         SecurityContextHolder.getContext().setAuthentication(auth);
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isUserDataValid(String idHeader, String roleHeader) {
-        if (!StringUtils.hasText(idHeader) || !StringUtils.hasText(roleHeader))
-            return false;
-        try {
-            Long.parseLong(idHeader);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }
