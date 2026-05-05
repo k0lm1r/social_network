@@ -28,7 +28,7 @@ public class CurrentUserUtil {
         if (allHeaders.values().stream().noneMatch(StringUtils::hasText))
             return false;
         try {
-            Long.valueOf(USER_ID);
+            Long.valueOf(allHeaders.get(USER_ID));
             return true;
         } catch (Exception _) {
             return false;
