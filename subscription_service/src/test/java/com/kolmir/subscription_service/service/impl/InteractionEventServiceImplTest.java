@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
 import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
-import com.kolmir.subscription_service.dto.event.LikeDislikeResponse;
 import com.kolmir.subscription_service.exception.AlreadyExistsException;
 import com.kolmir.subscription_service.exception.NotFoundException;
 import com.kolmir.subscription_service.mapper.InteractionEventMapper;
