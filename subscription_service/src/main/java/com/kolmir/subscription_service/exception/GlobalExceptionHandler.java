@@ -2,6 +2,7 @@ package com.kolmir.subscription_service.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,8 +21,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> exceptionHandler (IllegalArgumentException e) {
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    public ResponseEntity<ErrorResponse> exceptionHandler (RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getErrorResponse(e.getMessage()));
     }
 

@@ -10,36 +10,36 @@ import java.util.*;
 
 @Component
 public class LogSanitizer {
-    public Object mask(Object value) {
-        return mask(value, new IdentityHashMap<>());
+    public Object mask(Object valueForMasking) {
+        return mask(valueForMasking, new IdentityHashMap<>());
     }
 
-    private Object mask(Object value, IdentityHashMap<Object, Boolean> visited) {
-        if (value == null) return null;
-        if (isPrimitiveLike(value)) return maskStringIfNeeded(value);
+    private Object mask(Object valueForMasking, IdentityHashMap<Object, Boolean> visited) {
+        if (valueForMasking == null) return null;
+        if (isPrimitiveLike(valueForMasking)) return maskStringIfNeeded(valueForMasking);
 
-        if (visited.put(value, Boolean.TRUE) != null) return CYCLE_MESSAGE;
+        if (visited.put(valueForMasking, Boolean.TRUE) != null) return CYCLE_MESSAGE;
 
-        if (value instanceof Map<?, ?> map) {
-            Map<Object, Object> out = new LinkedHashMap<>();
-            for (var e : map.entrySet()) {
-                Object k = e.getKey();
-                Object v = e.getValue();
-                if (k instanceof String s && isSensitiveKey(s)) out.put(k, REDACTED_MESSAGE);
-                else out.put(k, mask(v, visited));
+        if (valueForMasking instanceof Map<?, ?> map) {
+            Map<Object, Object> maskedMap = new LinkedHashMap<>();
+            for (var entrySet : map.entrySet()) {
+                Object key = entrySet.getKey();
+                Object value = entrySet.getValue();
+                if (key instanceof String s && isSensitiveKey(s)) maskedMap.put(key, REDACTED_MESSAGE);
+                else maskedMap.put(key, mask(value, visited));
             }
-            return out;
-        } else if (value instanceof Collection<?> c) {
+            return maskedMap;
+        } else if (valueForMasking instanceof Collection<?> c) {
             return c.stream().map(v -> mask(v, visited)).toList();
-        } else if (value.getClass().isArray()) {
-            Object[] arr = (Object[])value;
+        } else if (valueForMasking.getClass().isArray()) {
+            Object[] arr = (Object[])valueForMasking;
             return Arrays.stream(arr).map(v -> mask(v, visited)).toArray();
         }
 
-        Class<?> type = value.getClass();
-        if (type.isRecord()) return maskRecord(value, visited);
+        Class<?> type = valueForMasking.getClass();
+        if (type.isRecord()) return maskRecord(valueForMasking, visited);
 
-        return value;
+        return valueForMasking;
     }
 
     private Object maskRecord(Object record, IdentityHashMap<Object, Boolean> visited) {
@@ -62,16 +62,16 @@ public class LogSanitizer {
         }
     }
 
-    private Object maskStringIfNeeded(Object v) {
-        if (v instanceof String s && BEARER.matcher(s).matches()) return REDACTED_MESSAGE;
-        return v;
+    private Object maskStringIfNeeded(Object str) {
+        if (str instanceof String s && BEARER.matcher(s).matches()) return REDACTED_MESSAGE;
+        return str;
     }
 
     private boolean isSensitiveKey(String key) {
         return SENSITIVE_KEYS.stream().anyMatch(k -> k.equalsIgnoreCase(key));
     }
 
-    private boolean isPrimitiveLike(Object v) {
-        return v instanceof String || v instanceof Number || v instanceof Boolean || v.getClass().isEnum();
+    private boolean isPrimitiveLike(Object primitive) {
+        return primitive instanceof String || primitive instanceof Number || primitive instanceof Boolean || primitive.getClass().isEnum();
     }
 }

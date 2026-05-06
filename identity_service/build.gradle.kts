@@ -16,6 +16,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":proto"))
     implementation(project(":logging-common"))
+    implementation(project(":auth-contract"))
     implementation("io.grpc:grpc-services")
 	implementation("org.springframework.grpc:spring-grpc-server-spring-boot-starter")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")

@@ -67,10 +67,14 @@ public class UserController implements UserControllerApi {
 
     @Override
     @PatchMapping(CHANGE_ROLE_URL)
-    @PreAuthorize("!@securityServiceImpl.isCurrentUserOwner(#id) && hasRole('MAIN_ADMIN')")
+    @PreAuthorize("!@securityServiceImpl.isCurrentUserOwner(#id)")
     public ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestBody @Valid UserChangeRoleRequest request) {
         return ResponseEntity.ok(userService.changeRole(id, request));
     }
 
+    @GetMapping(IS_USER_EXISTS_URL)
+    public Boolean isUserExists(@PathVariable Long id) {
+        return userService.isUserExists(id);
+    }
     
 }

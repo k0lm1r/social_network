@@ -26,6 +26,6 @@ public class Reaction {
     @Indexed(unique = true)
     private Long postId;
     
-    private Integer likeCount = 0;
-    private Integer dislikeCount = 0;
+    private Integer likeCount;
+    private Integer dislikeCount;
 }

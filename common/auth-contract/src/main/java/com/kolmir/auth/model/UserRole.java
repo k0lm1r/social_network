@@ -1,4 +1,4 @@
-package com.kolmir.identity_service.model;
+package com.kolmir.auth.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

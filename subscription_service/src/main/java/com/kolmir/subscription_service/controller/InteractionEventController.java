@@ -7,6 +7,7 @@ import com.kolmir.subscription_service.dto.event.CreateInteractionEventRequest;
 import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 import com.kolmir.subscription_service.service.InteractionEventService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import static com.kolmir.subscription_service.util.InteractionEventUtil.*;
@@ -46,7 +47,7 @@ public class InteractionEventController {
     }    
     
     @PostMapping
-    public ResponseEntity<InteractionEventResponse> createEvent(@RequestBody CreateInteractionEventRequest request) {
+    public ResponseEntity<InteractionEventResponse> createEvent(@Valid @RequestBody CreateInteractionEventRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
     }
     

@@ -9,7 +9,6 @@ import com.kolmir.subscription_service.dto.subscription.FollowCountResponse;
 import com.kolmir.subscription_service.dto.subscription.FollowListResponse;
 import com.kolmir.subscription_service.dto.subscription.SubscriptionLinkResponse;
 import com.kolmir.subscription_service.model.SubscriptionLink;
-import com.kolmir.subscription_service.security.SecurityUtils;
 
 
 @Mapper (
@@ -41,9 +40,9 @@ public interface SubscriptionLinkMapper {
         );
     }
 
-    public default SubscriptionLink toSubscriptionLink(Long followingId) {
+    public default SubscriptionLink toSubscriptionLink(Long followingId, Long followerId) {
         var link = new SubscriptionLink();
-        link.setFollowerId(SecurityUtils.getCurrentUser().id());
+        link.setFollowerId(followerId);
         link.setFollowingId(followingId);
         return link;
     }

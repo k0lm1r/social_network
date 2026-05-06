@@ -7,12 +7,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.dto.user.UserCreateRequest;
 import com.kolmir.identity_service.dto.user.UserResponse;
 import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.util.AuthUtils;
 
 

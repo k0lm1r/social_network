@@ -6,11 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ActionValidator.class)
 public @interface ValidAction {
-    String message();
+    String message() default "{action}";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }

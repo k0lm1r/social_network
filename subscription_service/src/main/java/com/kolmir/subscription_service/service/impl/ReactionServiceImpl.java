@@ -16,7 +16,7 @@ import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.Reaction;
 import com.kolmir.subscription_service.repository.ReactionRepository;
-import com.kolmir.subscription_service.security.SecurityUtils;
+import com.kolmir.security.provider.CurrentUserProvider;
 import com.kolmir.subscription_service.service.InteractionEventService;
 import com.kolmir.subscription_service.service.ReactionService;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +29,23 @@ public class ReactionServiceImpl implements ReactionService {
     private final ReactionRepository repository;
     private final ReactionMapper mapper;
     private final InteractionEventService interactionEventService;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
-    public ReactionResponse addReaction(AddReactionRequest request) {
-        interactionEventService.save(mapper.toCreateEventRequest(request));
-        return changeReactionsCount(request.postId(), Action.valueOf(request.action()), 1);
+    public ReactionResponse addReaction(AddReactionRequest request, Long postId) {
+        Long currentUserId = currentUserProvider.getCurrentUserId();
+        if (interactionEventService.userHasReaction(currentUserId, postId))
+            deleteReaction(postId);
+        
+        interactionEventService.save(mapper.toCreateEventRequest(request, postId, currentUserId));
+        return changeReactionsCount(postId, Action.valueOf(request.action()), 1);
     }
 
     @Override
     public ReactionResponse deleteReaction(Long postId) {
         LikeDislikeResponse event = (LikeDislikeResponse)interactionEventService
-            .getReacitonFromUser(SecurityUtils.getCurrentUser().id(), postId);
+            .getReacitonFromUser(currentUserProvider.getCurrentUserId(), postId);
+        interactionEventService.delete(event.id());
         return changeReactionsCount(postId, event.action(), -1);
     }
     
@@ -58,18 +64,17 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     private Reaction getReactionByPostId(Long postId) {
-        Reaction reaction = repository.findByPostId(postId).orElse(new Reaction());
-        if (reaction.getPostId() == null)
-            reaction.setPostId(postId);
+        Reaction reaction = repository.findByPostId(postId)
+            .orElse(new Reaction(null, postId, 0, 0));
         return reaction;
     }
 
     private ReactionResponse changeReactionsCount(Long postId, Action action, int delta) {
         Reaction reaction = getReactionByPostId(postId);
         if (action.equals(Action.LIKE))
-            reaction.setLikeCount(reaction.getLikeCount() + delta);
+            reaction.setLikeCount(Math.max(reaction.getLikeCount() + delta, 0));
         else 
-            reaction.setDislikeCount(reaction.getDislikeCount() + delta);
+            reaction.setDislikeCount(Math.max(reaction.getDislikeCount() + delta, 0));
         return mapper.toResponse(repository.save(reaction));
     }
 }

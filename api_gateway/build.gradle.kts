@@ -7,6 +7,7 @@ dependencies {
 	implementation("org.springframework.grpc:spring-grpc-client-spring-boot-starter")
 	implementation(project(":proto"))
 	implementation(project(":logging-common"))
+	implementation(project(":auth-contract"))
 	implementation("org.springframework.boot:spring-boot-starter-aspectj")
 
 	testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")

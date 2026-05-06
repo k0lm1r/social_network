@@ -18,4 +18,5 @@ public interface UserService {
     public UserResponse disable(Long id);
     public UserResponse changeRole(Long id, UserChangeRoleRequest request);
     public UserResponse saveCreatedUser(UserCreateRequest request);
+    public Boolean isUserExists(Long id);
 }

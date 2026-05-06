@@ -15,8 +15,12 @@ modules
     .filter { file(it).isDirectory }
     .forEach { include(":$it") }
 
-include(":auth-contract")
-project(":auth-contract").projectDir = file("common/auth-contract")
+if (file("common/auth-contract").isDirectory) {
+    include(":auth-contract")
+    project(":auth-contract").projectDir = file("common/auth-contract")
+}
 
-include(":auth-spring-security")
-project(":auth-spring-security").projectDir = file("common/auth-spring-security")
+if (file("common/auth-spring-security").isDirectory) {
+    include(":auth-spring-security")
+    project(":auth-spring-security").projectDir = file("common/auth-spring-security")
+}

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
 import com.kolmir.identity_service.dto.user.UserCreateRequest;
@@ -18,7 +19,6 @@ import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.service.UserService;
@@ -109,6 +109,11 @@ public class UserServiceImpl implements UserService {
             throw new UpdatingException(ROLE_CHANGING_EXCEPTION_MESSAGE + e.getMessage());
         }
     }
+    
+    @Override
+    public Boolean isUserExists(Long id) {
+        return userRepository.existsById(id);
+    }
 
     private User getUserById(Long id) {
         User user = userRepository.findById(id)
@@ -129,5 +134,4 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
-
 }

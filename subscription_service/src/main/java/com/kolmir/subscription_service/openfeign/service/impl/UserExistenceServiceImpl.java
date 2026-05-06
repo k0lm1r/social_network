@@ -1,10 +1,12 @@
 package com.kolmir.subscription_service.openfeign.service.impl;
 
 import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.USER_ID_WAS_NOT_VALIDATED_EXCEPTION;
+import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.USER_NOT_EXISTS_MESSAGE;
 
 import org.springframework.stereotype.Service;
 
 import com.kolmir.subscription_service.exception.ExternalServiceException;
+import com.kolmir.subscription_service.exception.NotFoundException;
 import com.kolmir.subscription_service.openfeign.UserClient;
 import com.kolmir.subscription_service.openfeign.service.UserExistenceService;
 
@@ -19,14 +21,14 @@ public class UserExistenceServiceImpl implements UserExistenceService {
     private final UserClient userClient;
 
     @Override
-    public boolean isUserExists(Long userId) {
+    public void validateUserExists(Long userId) {
         try {
-            userClient.getUserById(userId);
-            return true;
-        } catch (RetryableException e) {
+            if (!userClient.isUserExistsById(userId))
+                throw new NotFoundException(USER_NOT_EXISTS_MESSAGE);
+        } catch (RetryableException _) {
             throw new ExternalServiceException(USER_ID_WAS_NOT_VALIDATED_EXCEPTION);
-        } catch (FeignException _) {
-            return false;
+        } catch (FeignException e) {
+            throw new ExternalServiceException(e.getMessage());
         }
     }
 }
