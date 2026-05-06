@@ -1,11 +1,17 @@
 package com.kolmir.security.util;
 
+import static com.kolmir.auth.header.AuthHeaders.ALL_HEADERS;
+import static com.kolmir.auth.header.AuthHeaders.USERNAME;
+import static com.kolmir.auth.header.AuthHeaders.USER_EMAIL;
+import static com.kolmir.auth.header.AuthHeaders.USER_ID;
+import static com.kolmir.auth.header.AuthHeaders.USER_ROLE;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.springframework.util.StringUtils;
 
-import static com.kolmir.auth.header.AuthHeaders.*;
 import com.kolmir.auth.model.CurrentUser;
 import com.kolmir.auth.model.UserRole;
 
