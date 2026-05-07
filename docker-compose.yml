@@ -9,8 +9,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - identity_data:/var/lib/postgresql/data
+      - ./identity_init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -38,6 +38,24 @@ services:
           "mongosh --quiet --username ${SUBSCRIPTION_USERNAME} --password ${SUBSCRIPTION_PASSWORD} --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1",
         ]
       interval: 120s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  
+  feed-db:
+    image: postgres:17
+    container_name: feed-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - feed_data:/var/lib/postgresql/data
+      - ./feed_init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
       timeout: 5s
       retries: 10
       start_period: 10s
@@ -123,9 +141,32 @@ services:
       - .env
     volumes:
       - ./app-logs/subscription-service:/app/logs
+
+  feed-service:
+    build:
+      context: .
+      dockerfile: ./feed_service/Dockerfile
+    container_name: feed-service
+    depends_on:
+      eureka: 
+        condition: service_started
+      feed-db:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: identity-db
+      DB_PORT: 5433
+    volumes:
+      - ./app-logs/feed-service:/app/logs
+        
   
 volumes:
-  postgres_data:
+  identity_data:
   app-logs:
   subscription_data:
+  feed_data:
+
   
