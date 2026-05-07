@@ -35,6 +35,11 @@ public class ReactionController {
         return ResponseEntity.ok(reactionService.getReactionsForAllPosts(postIds));
     }
 
+    @GetMapping(POST_ID_URL)
+    public ResponseEntity<ReactionResponse> getReactionsForPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(reactionService.getReactionsForPost(postId));
+    }
+
     @PatchMapping(POST_ID_URL)
     public ResponseEntity<ReactionResponse> addReaction(@Valid @RequestBody AddReactionRequest request, @PathVariable Long postId) {
         return ResponseEntity.ok(reactionService.addReaction(request, postId));

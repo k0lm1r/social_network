@@ -49,6 +49,8 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private Double popularity;
+
     @OneToMany(
         mappedBy = "post", 
         cascade = {

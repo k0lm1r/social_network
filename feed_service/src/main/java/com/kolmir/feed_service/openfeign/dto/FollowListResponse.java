@@ -1,4 +1,4 @@
-package com.kolmir.subscription_service.dto.subscription;
+package com.kolmir.feed_service.openfeign.dto;
 
 import java.util.Collection;
 

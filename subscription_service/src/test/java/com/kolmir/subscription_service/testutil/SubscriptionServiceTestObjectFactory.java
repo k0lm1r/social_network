@@ -97,14 +97,14 @@ public class SubscriptionServiceTestObjectFactory {
 
     public static FollowListResponse followersListResponse() {
         return new FollowListResponse(
-            followCountResponse(2),
+            2,
             List.of(FIRST_FOLLOWER_ID, SECOND_FOLLOWER_ID)
         );
     }
 
     public static FollowListResponse followingsListResponse() {
         return new FollowListResponse(
-            followCountResponse(2),
+            2,
             List.of(FIRST_FOLLOWING_ID, SECOND_FOLLOWING_ID)
         );
     }
