@@ -7,7 +7,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class SubscriptionLinkUtil {
-    public final static String NOT_FOUND_MESSAGE = "Current user don't follow this account";    
+    public final static String NOT_FOUND_MESSAGE = "Current user don't follow this account"; 
+    public final static String FOLLOW_YOURSELF_MESSAGE = "You can't follow yourself";   
     public final static String SUBSCRIPTION_MAIN_URL = "/api/subscriptions";
     public final static String FOLLOWERS_LIST_URL = USER_ID_URL + "/followers";
     public final static String FOLLOWINGS_LIST_URL = USER_ID_URL + "/followings";

@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(POST_MAIN_URL)
+@RequestMapping(REACTION_MAIN_URL)
 public class ReactionController {
     private final ReactionService reactionService;
 

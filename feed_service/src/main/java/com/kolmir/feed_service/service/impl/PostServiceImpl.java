@@ -4,6 +4,9 @@ import static com.kolmir.feed_service.util.PostUtil.*;
 
 import java.time.LocalDateTime;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,18 +40,21 @@ public class PostServiceImpl implements PostService {
     private final FollowingAndReactionsService followingAndReactionsService;
     
     @Override
+    @Cacheable(cacheNames = ALL_POSTS_CACHE, keyGenerator = "pageKeyGenerator")
     public Page<PostResponse> getAll(Pageable pageable) {
         return postRepository.findAll(pageable)
             .map(postMapper::toResponse);
     }
     
     @Override
+    @Cacheable(cacheNames = ALL_FROM_USER_CACHE, keyGenerator = "pageKeyGenerator")
     public Page<PostResponse> getAllFromUser(Long userId, Pageable pageable) {
         return postRepository.findAllByAuthorId(userId, pageable)
             .map(postMapper::toResponse);
     }
 
     @Override
+    @Cacheable(cacheNames = FEEDS_CACHE, keyGenerator = "pageKeyGenerator")
     public Page<PostResponse> getFeedForUser(Long userId, Pageable pageable) {
         return postRepository.findByAuthorIdIn(
             followingAndReactionsService.getFollowingsIdsForUser(userId), 
@@ -57,12 +63,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(cacheNames = POST_CACHE, key = "#id")
     public PostResponse getById(Long id) {
         return postMapper.toResponse(findById(id));
     }
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true)
     public PostResponse create(PostRequest request) {
         Post post = postMapper.toPost(request);
         post.setAuthorId(currentUserProvider.getCurrentUserId());
@@ -71,6 +79,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = POST_CACHE, key = "#id")
+    })    
     public PostResponse update(Long id, PostRequest request) {
         Post post = findById(id);
         post.setText(request.text());
@@ -80,12 +92,20 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = POST_CACHE, key = "#id")
+    })
     public void delete(Long id) {
         postRepository.delete(findById(id));
     }
 
     @Override
-    public PostResponse updatePopularity(Long postId) {
+    @Caching(evict = {
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = POST_CACHE, key = "#postId")
+    })
+    public void updatePopularity(Long postId) {
         Post post = findById(postId);
         ReactionResponse reactions = followingAndReactionsService.getReactionsForPost(postId);
         
@@ -95,7 +115,17 @@ public class PostServiceImpl implements PostService {
             commentService.getCommentsCountForPost(postId)
         ));
 
-        return postMapper.toResponse(postRepository.save(post));
+        postMapper.toResponse(postRepository.save(post));
+    }
+
+    @Override
+    public Boolean isPostExists(Long postId) {
+        return postRepository.existsById(postId);
+    }
+
+    @Override
+    public Boolean isCurrentUserOwner(Long postId) {
+        return postRepository.existsByIdAndAuthorId(currentUserProvider.getCurrentUserId(), postId);
     }
 
     private Pageable withSortByPopularity(Pageable pageable) {

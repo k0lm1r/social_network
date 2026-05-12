@@ -24,6 +24,4 @@ public class FollowingAndReactionsServiceImpl implements FollowingAndReactionsSe
     public ReactionResponse getReactionsForPost(Long postId) {
         return subscriptionClient.getReactionsForPosts(postId);
     }
-
-
 }

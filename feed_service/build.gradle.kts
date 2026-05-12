@@ -9,6 +9,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation(project(":logging-common"))
 	implementation(project(":auth-contract"))
 	implementation(project(":auth-spring-security"))
