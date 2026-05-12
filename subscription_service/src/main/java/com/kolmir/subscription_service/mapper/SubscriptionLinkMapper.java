@@ -24,7 +24,7 @@ public interface SubscriptionLinkMapper {
 
     public default FollowListResponse toFollowersListResponse(Collection<SubscriptionLink> links) {
         return new FollowListResponse(
-            toFollowCountResponse(links.size()), 
+            links.size(), 
             links.stream()
                 .map(SubscriptionLink::getFollowerId)
                 .toList()
@@ -33,7 +33,7 @@ public interface SubscriptionLinkMapper {
 
     public default FollowListResponse toFollowingsListResponse(Collection<SubscriptionLink> links) {
         return new FollowListResponse(
-            toFollowCountResponse(links.size()), 
+            links.size(), 
             links.stream()
                 .map(SubscriptionLink::getFollowingId)
                 .toList()

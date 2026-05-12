@@ -48,6 +48,12 @@ public class ReactionServiceImpl implements ReactionService {
         interactionEventService.delete(event.id());
         return changeReactionsCount(postId, event.action(), -1);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReactionResponse getReactionsForPost(Long postId) {
+        return mapper.toResponse(getReactionByPostId(postId));
+    }
     
     @Override
     @Transactional(readOnly = true)

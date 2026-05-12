@@ -27,8 +27,10 @@ public class UserHeadersFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         Optional<CurrentUser> optionalUser = CurrentUserUtil.extractCurrentUser(request);
-        if (optionalUser.isEmpty())
+        if (optionalUser.isEmpty()) {
             filterChain.doFilter(request, response);
+            return;
+        }
 
         CurrentUser currentUser = optionalUser.get();
         UsernamePasswordAuthenticationToken auth =
