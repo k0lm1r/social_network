@@ -9,12 +9,16 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation(project(":logging-common"))
 	implementation(project(":auth-contract"))
 	implementation(project(":auth-spring-security"))
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 jacoco {

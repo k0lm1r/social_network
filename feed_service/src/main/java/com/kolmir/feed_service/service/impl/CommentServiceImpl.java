@@ -62,6 +62,11 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(findById(commentId));
     }
 
+    @Override
+    public Boolean isCurrentUserOwner(Long commentId) {
+        return commentRepository.existsByIdAndAuthorId(currentUserProvider.getCurrentUserId(), commentId);
+    }
+
     private Comment findById(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(
             () -> new NotFoundException(NOT_FOUND_MESSAGE)

@@ -14,4 +14,5 @@ public interface CommentService {
     public CommentResponse getById(Long commentId);
     public CommentResponse create(CommentCreateRequest request);
     public void delete(Long commentId);
+    public Boolean isCurrentUserOwner(Long commentId);
 }

@@ -1,5 +1,7 @@
 package com.kolmir.subscription_service.service.impl;
 
+import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.POST_NOT_FOUND_MESSAGE;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +17,13 @@ import com.kolmir.subscription_service.factory.ReactionFactory;
 import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.model.Action;
 import com.kolmir.subscription_service.model.Reaction;
+import com.kolmir.subscription_service.openfeign.service.PostService;
 import com.kolmir.subscription_service.repository.ReactionRepository;
 import com.kolmir.security.provider.CurrentUserProvider;
 import com.kolmir.subscription_service.service.InteractionEventService;
 import com.kolmir.subscription_service.service.ReactionService;
+
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 
@@ -30,6 +35,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final ReactionMapper mapper;
     private final InteractionEventService interactionEventService;
     private final CurrentUserProvider currentUserProvider;
+    private final PostService postService;
 
     @Override
     public ReactionResponse addReaction(AddReactionRequest request, Long postId) {
@@ -70,6 +76,8 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     private Reaction getReactionByPostId(Long postId) {
+        if (!postService.isPostExists(postId))
+            throw new NotFoundException(POST_NOT_FOUND_MESSAGE);
         Reaction reaction = repository.findByPostId(postId)
             .orElse(new Reaction(null, postId, 0, 0));
         return reaction;
@@ -81,6 +89,7 @@ public class ReactionServiceImpl implements ReactionService {
             reaction.setLikeCount(Math.max(reaction.getLikeCount() + delta, 0));
         else 
             reaction.setDislikeCount(Math.max(reaction.getDislikeCount() + delta, 0));
+        postService.updatePopularity(postId);
         return mapper.toResponse(repository.save(reaction));
     }
 }

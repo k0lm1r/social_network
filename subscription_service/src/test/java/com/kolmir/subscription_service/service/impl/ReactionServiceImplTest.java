@@ -24,6 +24,7 @@ import com.kolmir.subscription_service.dto.reaction.AddReactionRequest;
 import com.kolmir.subscription_service.dto.reaction.ReactionResponse;
 import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.model.Reaction;
+import com.kolmir.subscription_service.openfeign.service.PostService;
 import com.kolmir.subscription_service.repository.ReactionRepository;
 import com.kolmir.subscription_service.service.InteractionEventService;
 
@@ -41,6 +42,9 @@ class ReactionServiceImplTest {
     @Mock
     private CurrentUserProvider currentUserProvider;
 
+    @Mock
+    private PostService postService;
+
     @InjectMocks
     private ReactionServiceImpl service;
 
@@ -50,6 +54,7 @@ class ReactionServiceImplTest {
         CreateInteractionEventRequest eventRequest = createLikeEventRequest();
 
         when(currentUserProvider.getCurrentUserId()).thenReturn(USER_ID);
+        when(postService.isPostExists(POST_ID)).thenReturn(true);
         when(interactionEventService.userHasReaction(USER_ID, POST_ID)).thenReturn(false);
         when(mapper.toCreateEventRequest(request, POST_ID, USER_ID)).thenReturn(eventRequest);
         when(repository.findByPostId(POST_ID)).thenReturn(Optional.empty());
@@ -69,6 +74,7 @@ class ReactionServiceImplTest {
         CreateInteractionEventRequest eventRequest = createLikeEventRequest();
 
         when(currentUserProvider.getCurrentUserId()).thenReturn(USER_ID);
+        when(postService.isPostExists(POST_ID)).thenReturn(true);
         when(interactionEventService.userHasReaction(USER_ID, POST_ID)).thenReturn(true);
         when(interactionEventService.getReacitonFromUser(USER_ID, POST_ID))
             .thenReturn(previousDislikeResponse());
@@ -89,6 +95,7 @@ class ReactionServiceImplTest {
         Reaction reaction = emptyReaction();
 
         when(currentUserProvider.getCurrentUserId()).thenReturn(USER_ID);
+        when(postService.isPostExists(POST_ID)).thenReturn(true);
         when(interactionEventService.getReacitonFromUser(USER_ID, POST_ID))
             .thenReturn(likeDislikeResponse());
         when(repository.findByPostId(POST_ID)).thenReturn(Optional.of(reaction));

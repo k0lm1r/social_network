@@ -13,7 +13,9 @@ public interface PostService {
     public Page<PostResponse> getFeedForUser(Long userId, Pageable pageable);
     public PostResponse getById(Long id);
     public PostResponse create(PostRequest request);
-    public PostResponse updatePopularity(Long postId);
+    public void updatePopularity(Long postId);
     public PostResponse update(Long id, PostRequest request);
+    public Boolean isPostExists(Long postId);
     public void delete(Long id);
+    public Boolean isCurrentUserOwner(Long postId);
 }

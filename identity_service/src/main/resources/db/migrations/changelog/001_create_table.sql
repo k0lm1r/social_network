@@ -2,7 +2,7 @@
 
 --changeset Andrey:1
 --comment: users table creating
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     keycloak_id VARCHAR(100) NOT NULL,
     username VARCHAR(50) NOT NULL UNIQUE,

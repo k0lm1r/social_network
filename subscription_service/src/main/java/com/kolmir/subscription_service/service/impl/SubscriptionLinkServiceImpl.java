@@ -30,6 +30,10 @@ public class SubscriptionLinkServiceImpl implements SubscriptionLinkService {
     @Override
     public SubscriptionLinkResponse follow(Long followingId) {
         userExistenceService.validateUserExists(followingId);
+
+        if (followingId == currentUserProvider.getCurrentUserId())
+            throw new IllegalArgumentException(FOLLOW_YOURSELF_MESSAGE);
+
         return mapper.toSubscriptionLinkResponse(
             repository.save(
                 mapper.toSubscriptionLink(followingId, currentUserProvider.getCurrentUserId())

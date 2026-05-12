@@ -45,11 +45,11 @@ public class Post {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
+    private Double popularity;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    private Double popularity;
 
     @OneToMany(
         mappedBy = "post", 
