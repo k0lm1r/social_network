@@ -4,14 +4,14 @@ WORKDIR /app
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY subscription_service/build.gradle.kts subscription_service/build.gradle.kts
-COPY logging-common/build.gradle.kts logging-common/build.gradle.kts
+COPY common/logging-common/build.gradle.kts common/logging-common/build.gradle.kts
 COPY common/auth-contract/build.gradle.kts common/auth-contract/build.gradle.kts
 COPY common/auth-spring-security/build.gradle.kts common/auth-spring-security/build.gradle.kts
 
 RUN gradle :subscription_service:dependencies --no-daemon || true
 
 COPY subscription_service subscription_service
-COPY logging-common logging-common
+COPY common/logging-common common/logging-common
 COPY common/auth-contract common/auth-contract
 COPY common/auth-spring-security common/auth-spring-security
 

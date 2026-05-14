@@ -40,3 +40,9 @@ info:
   app:
     name: API Gateway
     description: Single entrypoint
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.api_gateway.service..*(..)"
+    exclude: []

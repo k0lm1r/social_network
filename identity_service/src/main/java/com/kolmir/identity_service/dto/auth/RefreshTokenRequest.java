@@ -1,6 +1,7 @@
 package com.kolmir.identity_service.dto.auth;
 
-import com.kolmir.identity_service.logging.Sensitive;
+
+import com.kolmir.logging.sanitizer.Sensitive;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -9,4 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record LogAspectProperties (
     List<String> include,
     List<String> exclude
-){}
+){
+    public LogAspectProperties {
+        include = include == null ? List.of("* com.kolmir.*.service..*(..)") : include;
+        exclude = exclude == null ? List.of() : exclude;
+    }
+}

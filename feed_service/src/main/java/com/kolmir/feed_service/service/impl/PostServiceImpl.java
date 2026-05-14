@@ -125,7 +125,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Boolean isCurrentUserOwner(Long postId) {
-        return postRepository.existsByIdAndAuthorId(currentUserProvider.getCurrentUserId(), postId);
+        return postRepository.existsByIdAndAuthorId(postId, currentUserProvider.getCurrentUserId());
     }
 
     private Pageable withSortByPopularity(Pageable pageable) {

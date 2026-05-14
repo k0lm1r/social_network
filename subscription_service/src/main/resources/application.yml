@@ -32,3 +32,9 @@ info:
   app:
     name: Subscription service
     description: Social interaction processing service
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.subscription_service.service..*(..)"
+    exclude: []

@@ -1,3 +1,4 @@
 <configuration>
     <include resource="base-logback-spring.xml"/>
+    <property name="APP_NAME" value="feed-service"/>
 </configuration>

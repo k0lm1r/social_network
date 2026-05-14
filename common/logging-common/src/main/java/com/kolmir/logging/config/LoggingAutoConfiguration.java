@@ -10,19 +10,23 @@ import com.kolmir.logging.aop.LoggingAspect;
 import com.kolmir.logging.matcher.LogAspectMatcher;
 import com.kolmir.logging.sanitizer.LogSanitizer;
 
-import lombok.RequiredArgsConstructor;
-
 
 @AutoConfiguration
-@RequiredArgsConstructor
 @ConditionalOnClass(Aspect.class)
 @EnableConfigurationProperties(LogAspectProperties.class)
 public class LoggingAutoConfiguration {
-    private final LogSanitizer logSanitizer;
-    private final LogAspectMatcher logAspectMatcher;
+    @Bean
+    public LogAspectMatcher logAspectMatcher(LogAspectProperties properties) {
+        return new LogAspectMatcher(properties);
+    }
 
     @Bean
-    public LoggingAspect loggingAspect() {
+    public LoggingAspect loggingAspect(LogSanitizer logSanitizer, LogAspectMatcher logAspectMatcher) {
         return new LoggingAspect(logSanitizer, logAspectMatcher);
+    }
+
+    @Bean 
+    public LogSanitizer logSanitizer() {
+        return new LogSanitizer();
     }
 }

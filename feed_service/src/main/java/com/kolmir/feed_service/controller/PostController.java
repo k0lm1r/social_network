@@ -49,7 +49,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getById(postId));
     }
 
-    @GetMapping(POST_ID_URL)
+    @GetMapping(EXISTING_URL)
     public ResponseEntity<Boolean> isPostExists(@PathVariable Long postId) {
         return ResponseEntity.ok(postService.isPostExists(postId));
     }
@@ -61,14 +61,14 @@ public class PostController {
     }
     
     @DeleteMapping(POST_ID_URL)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MAIN_ADMIN') || @postService.isCurrentUserOwner(#commentId)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MAIN_ADMIN') || @postService.isCurrentUserOwner(#postId)")
     public ResponseEntity<Void> delete(@PathVariable Long postId) {
         postService.delete(postId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(POST_ID_URL)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MAIN_ADMIN') || @postService.isCurrentUserOwner(#commentId)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MAIN_ADMIN') || @postService.isCurrentUserOwner(#postId)")
     public ResponseEntity<PostResponse> update(@PathVariable Long postId, @RequestBody PostRequest request) {
         return ResponseEntity.ok(postService.update(postId, request));
     }

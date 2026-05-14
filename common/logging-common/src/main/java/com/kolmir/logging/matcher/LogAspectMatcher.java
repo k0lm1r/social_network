@@ -2,7 +2,6 @@ package com.kolmir.logging.matcher;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 
 import com.kolmir.logging.config.LogAspectProperties;
@@ -10,8 +9,6 @@ import com.kolmir.logging.config.LogAspectProperties;
 import lombok.RequiredArgsConstructor;
 
 
-
-@Component
 @RequiredArgsConstructor
 public class LogAspectMatcher {
     private final LogAspectProperties properties;

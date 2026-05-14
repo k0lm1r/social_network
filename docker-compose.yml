@@ -4,24 +4,27 @@ services:
     image: postgres:17
     container_name: identity-db
     restart: always
+    cpus: 0.5
+    mem_limit: 512m
     env_file:
       - .env
     ports:
       - "5432:5432"
     volumes:
       - identity_data:/var/lib/postgresql/data
-      - ./identity_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init_sql/identity_init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 10s
-  
   subscription-db:
     image: mongo:8.2.7
     container_name: subscription-db
     restart: always
+    cpus: 0.5
+    mem_limit: 768m
     env_file:
       - .env
     environment:
@@ -46,15 +49,31 @@ services:
     image: postgres:17
     container_name: feed-db
     restart: always
+    cpus: 0.5
+    mem_limit: 512m
     env_file:
       - .env
     ports:
       - "5433:5432"
     volumes:
       - feed_data:/var/lib/postgresql/data
-      - ./feed_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init_sql/feed_init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    cpus: 0.25
+    mem_limit: 256m
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -64,6 +83,8 @@ services:
     image: quay.io/keycloak/keycloak:26.5
     container_name: keycloak
     command: start-dev
+    cpus: 1.0
+    mem_limit: 1g
     depends_on:
       identity-db:
         condition: service_healthy
@@ -83,6 +104,8 @@ services:
       context: .
       dockerfile: ./identity_service/Dockerfile
     container_name: identity-service
+    cpus: 0.75
+    mem_limit: 768m
     depends_on:
       identity-db:
         condition: service_healthy
@@ -105,6 +128,8 @@ services:
       context: .
       dockerfile: ./eureka_server/Dockerfile
     container_name: eureka
+    cpus: 0.5
+    mem_limit: 384m
     ports:
       - "8761:8761"
 
@@ -113,10 +138,16 @@ services:
       context: .
       dockerfile: ./api_gateway/Dockerfile
     container_name: api-gateway
+    cpus: 0.75
+    mem_limit: 512m
     depends_on:
       eureka:
         condition: service_started
       identity-service:
+        condition: service_started
+      subscription-service:
+        condition: service_started
+      feed-service:
         condition: service_started
     ports:
       - "8080:8081"
@@ -130,6 +161,8 @@ services:
       context: .
       dockerfile: ./subscription_service/Dockerfile
     container_name: subscription-service
+    cpus: 0.75
+    mem_limit: 768m
     depends_on:
       eureka: 
         condition: service_started
@@ -147,26 +180,29 @@ services:
       context: .
       dockerfile: ./feed_service/Dockerfile
     container_name: feed-service
+    cpus: 0.75
+    mem_limit: 768m
     depends_on:
       eureka: 
         condition: service_started
       feed-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     ports:
       - "8084:8084"
     env_file:
       - .env
     environment:
-      DB_HOST: identity-db
-      DB_PORT: 5433
+      DB_HOST: feed-db
+      DB_PORT: 5432
     volumes:
       - ./app-logs/feed-service:/app/logs
-        
+
+
   
 volumes:
   identity_data:
   app-logs:
   subscription_data:
   feed_data:
-
-  
