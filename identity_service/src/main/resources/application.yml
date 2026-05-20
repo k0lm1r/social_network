@@ -48,7 +48,12 @@ management:
         include:
         - health
         - info
-        - metrics  
+        - metrics
+        - prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   app:

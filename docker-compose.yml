@@ -82,9 +82,9 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.5
     container_name: keycloak
-    command: start-dev
+    command: start-dev --import-realm
     cpus: 1.0
-    mem_limit: 1g
+    mem_limit: 1536m
     depends_on:
       identity-db:
         condition: service_healthy
@@ -98,6 +98,8 @@ services:
       KC_HEALTH_ENABLED: "true"
     ports:
       - "8888:8080"
+    volumes:
+      - ./keycloak_init.json:/opt/keycloak/data/import/keycloak_init.json:ro
 
   identity-service:
     build:
@@ -105,7 +107,7 @@ services:
       dockerfile: ./identity_service/Dockerfile
     container_name: identity-service
     cpus: 0.75
-    mem_limit: 768m
+    mem_limit: 1g
     depends_on:
       identity-db:
         condition: service_healthy
@@ -129,7 +131,7 @@ services:
       dockerfile: ./eureka_server/Dockerfile
     container_name: eureka
     cpus: 0.5
-    mem_limit: 384m
+    mem_limit: 512m
     ports:
       - "8761:8761"
 
@@ -139,7 +141,7 @@ services:
       dockerfile: ./api_gateway/Dockerfile
     container_name: api-gateway
     cpus: 0.75
-    mem_limit: 512m
+    mem_limit: 768m
     depends_on:
       eureka:
         condition: service_started
@@ -162,7 +164,7 @@ services:
       dockerfile: ./subscription_service/Dockerfile
     container_name: subscription-service
     cpus: 0.75
-    mem_limit: 768m
+    mem_limit: 1g
     depends_on:
       eureka: 
         condition: service_started
@@ -181,7 +183,7 @@ services:
       dockerfile: ./feed_service/Dockerfile
     container_name: feed-service
     cpus: 0.75
-    mem_limit: 768m
+    mem_limit: 1g
     depends_on:
       eureka: 
         condition: service_started

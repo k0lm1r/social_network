@@ -16,7 +16,10 @@ public class GatewayRoutesConfig {
                     .uri("lb://identity-service"))
                 .route("subscription-service-route", r -> r
                     .path("/api/events/**", "/api/subscriptions/**", "/api/reactions/**")
-                    .uri("lb://subscription-service")
+                    .uri("lb://subscription-service"))
+                .route("feed-service-route", r -> r
+                    .path("/api/comments/**", "/api/posts/**")
+                    .uri("lb://feed-service")
                 ).build();
     }
 }

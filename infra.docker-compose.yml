@@ -3,7 +3,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.0
     container_name: elasticsearch
     cpus: 2.0
-    mem_limit: 2g
+    mem_limit: 3g
     environment:
       - node.name=elasticsearch
       - cluster.name=elk-local
@@ -24,7 +24,7 @@ services:
     image: docker.elastic.co/logstash/logstash:9.4.0
     container_name: logstash
     cpus: 1.0
-    mem_limit: 1g
+    mem_limit: 1536m
     depends_on:
       - elasticsearch
     ports:
@@ -38,14 +38,47 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:9.4.0
     container_name: kibana
-    cpus: 0.75
-    mem_limit: 768m
+    cpus: 1.0
+    mem_limit: 2g
     depends_on:
       - elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - NODE_OPTIONS=--max-old-space-size=1536
     ports:
       - "5601:5601"
 
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: prometheus
+    cpus: 0.75
+    mem_limit: 1g
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+
+  grafana:
+    image: grafana/grafana:12.1.0
+    container_name: grafana
+    cpus: 0.75
+    mem_limit: 1g
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+
 volumes:
   elasticsearch-data:
+  prometheus-data:
+  grafana-data:
