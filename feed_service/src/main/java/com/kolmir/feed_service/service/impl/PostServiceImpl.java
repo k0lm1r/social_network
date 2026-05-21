@@ -74,6 +74,7 @@ public class PostServiceImpl implements PostService {
     public PostResponse create(PostRequest request) {
         Post post = postMapper.toPost(request);
         post.setAuthorId(currentUserProvider.getCurrentUserId());
+        post.setPopularity(Double.valueOf(0));
         return postMapper.toResponse(postRepository.save(post));
     }
 
@@ -146,7 +147,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
-    private Double calcPopularity(Integer likesCount, Integer dislikesCount, Integer commentsCount) {
+    private Double calcPopularity(Integer likesCount, Integer dislikesCount, Long commentsCount) {
         return likesCount * 1.5 - dislikesCount + commentsCount * 2;
     }
 }

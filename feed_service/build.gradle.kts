@@ -21,6 +21,12 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 	implementation("org.springframework.boot:spring-boot-starter-liquibase")
     runtimeOnly("org.postgresql:postgresql")
+
+	testImplementation("io.cucumber:cucumber-java:7.20.1")
+	testImplementation("io.cucumber:cucumber-junit-platform-engine:7.20.1")
+	testImplementation("org.junit.platform:junit-platform-suite")
+	testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+	testImplementation("org.testcontainers:postgresql:1.21.3")
 }
 
 jacoco {

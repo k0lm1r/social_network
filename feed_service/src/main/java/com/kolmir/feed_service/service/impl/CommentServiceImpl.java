@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Integer getCommentsCountForPost(Long postId) {
+    public Long getCommentsCountForPost(Long postId) {
         return commentRepository.findCountByPostId(postId);
     }
 
