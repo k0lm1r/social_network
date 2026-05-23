@@ -55,10 +55,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Cacheable(cacheNames = FEEDS_CACHE, keyGenerator = "pageKeyGenerator")
-    public Page<PostResponse> getFeedForUser(Long userId, Pageable pageable) {
+    public Page<PostResponse> getFeedForUser(Long userId, int pageNumber, int pageSize) {
         return postRepository.findByAuthorIdIn(
             followingAndReactionsService.getFollowingsIdsForUser(userId), 
-            withSortByPopularity(pageable)
+            withSortByPopularity(pageNumber, pageSize)
         ).map(postMapper::toResponse);
     }
 
@@ -70,7 +70,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true)
+    @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true)
     public PostResponse create(PostRequest request) {
         Post post = postMapper.toPost(request);
         post.setAuthorId(currentUserProvider.getCurrentUserId());
@@ -81,7 +81,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#id")
     })    
     public PostResponse update(Long id, PostRequest request) {
@@ -94,7 +94,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#id")
     })
     public void delete(Long id) {
@@ -102,8 +102,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#postId")
     })
     public void updatePopularity(Long postId) {
@@ -129,14 +130,14 @@ public class PostServiceImpl implements PostService {
         return postRepository.existsByIdAndAuthorId(postId, currentUserProvider.getCurrentUserId());
     }
 
-    private Pageable withSortByPopularity(Pageable pageable) {
+    public Pageable withSortByPopularity(int pageNumber, int pageSize) {
         Sort sortByPopularity = Sort.by(
             Sort.Order.desc(CREATED_AT_FIELD),
             Sort.Order.desc(POPULARITY_FIELD_NAME)
         );
         return PageRequest.of(
-            pageable.getPageNumber(),
-            pageable.getPageSize(),
+            pageNumber,
+            pageSize,
             sortByPopularity
         );
     }

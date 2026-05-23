@@ -27,6 +27,7 @@ public class SpringSecurityConfig {
             .addFilterBefore(userHeadersFilter, AnonymousAuthenticationFilter.class)
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers(POST_MAIN_URL + FEED_URL).authenticated()
                 .requestMatchers(HttpMethod.GET, POST_MAIN_URL + "/**", COMMENT_MAIN_URL + "/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, POST_MAIN_URL + POPULARITY_URL).permitAll()

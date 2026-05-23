@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -28,8 +27,11 @@ import com.kolmir.feed_service.repository.CommentRepository;
 import com.kolmir.feed_service.repository.PostRepository;
 import com.kolmir.feed_service.service.PostService;
 import com.kolmir.security.provider.CurrentUserProvider;
+
 import org.mockito.Mockito;
 
+
+@SuppressWarnings("resource")
 @SpringBootTest(
     properties = {
         "eureka.client.enabled=false",
@@ -40,7 +42,7 @@ import org.mockito.Mockito;
 )
 @Testcontainers
 class FeedServiceIntegrationTest {
-
+//TODO вынести в отдельный класс
     @Container
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(POSTGRES_IMAGE)
         .withDatabaseName(FEED_TEST_DB)
@@ -114,7 +116,8 @@ class FeedServiceIntegrationTest {
 
         var page = postService.getFeedForUser(
             CURRENT_USER_ID,
-            PageRequest.of(PAGE_INDEX, PAGE_SIZE, Sort.unsorted())
+            PAGE_INDEX,
+            PAGE_SIZE
         );
 
         assertThat(page.getContent()).hasSize(EXPECTED_FEED_SIZE);

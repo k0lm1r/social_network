@@ -102,7 +102,11 @@ public class FeedServiceSteps {
 
     @When("the user requests their feed")
     public void theUserRequestsTheirFeed() {
-        feedPage = postService.getFeedForUser(FeedBddTestConstants.USER_ID, pageable);
+        feedPage = postService.getFeedForUser(
+            FeedBddTestConstants.USER_ID,
+            FeedBddTestConstants.PAGE_NUMBER,
+            FeedBddTestConstants.PAGE_SIZE
+        );
     }
 
     @Then("the feed contains only posts from followings")

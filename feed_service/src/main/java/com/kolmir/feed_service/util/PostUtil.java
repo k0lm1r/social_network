@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 public class PostUtil {
     public static final String ALL_POSTS_CACHE = "all_posts";
     public static final String ALL_FROM_USER_CACHE = "all_from_user";
-    public static final String ALL_FROM_USERS_CACHE = "all_from_users";
     public static final String FEEDS_CACHE = "feeds";
     public static final String POST_CACHE = "post";
 

@@ -22,9 +22,9 @@ services:
   subscription-db:
     image: mongo:8.2.7
     container_name: subscription-db
-    restart: always
+    restart: on-failure
     cpus: 0.5
-    mem_limit: 768m
+    mem_limit: 1.5g
     env_file:
       - .env
     environment:

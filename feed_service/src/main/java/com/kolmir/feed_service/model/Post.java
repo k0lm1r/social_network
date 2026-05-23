@@ -53,5 +53,6 @@ public class Post {
             CascadeType.PERSIST
         }
     )
+    @ToString.Exclude
     private List<Comment> comments;
 }
