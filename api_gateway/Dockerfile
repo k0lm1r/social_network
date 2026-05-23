@@ -7,13 +7,13 @@ COPY build.gradle.kts .
 
 COPY api_gateway/build.gradle.kts api_gateway/build.gradle.kts
 COPY proto/build.gradle.kts proto/build.gradle.kts
-COPY logging-common/build.gradle.kts logging-common/build.gradle.kts
+COPY common/logging-common/build.gradle.kts common/logging-common/build.gradle.kts
 COPY common/auth-contract/build.gradle.kts common/auth-contract/build.gradle.kts
 RUN gradle :api_gateway:dependencies --no-daemon || true
 
 COPY proto proto
 COPY api_gateway api_gateway
-COPY logging-common logging-common
+COPY common/logging-common common/logging-common
 COPY common/auth-contract common/auth-contract
 RUN gradle :api_gateway:bootJar -x test --no-daemon
 

@@ -1,14 +1,12 @@
-package com.kolmir.identity_service.logging;
+package com.kolmir.logging.sanitizer;
 
-import org.springframework.stereotype.Component;
+import static com.kolmir.logging.util.AuthUtils.*;
 
-import static com.kolmir.identity_service.util.AuthUtils.*;
-
+import java.lang.reflect.Array;
 import java.lang.reflect.RecordComponent;
 import java.util.*;
 
 
-@Component
 public class LogSanitizer {
     public Object mask(Object valueForMasking) {
         return mask(valueForMasking, new IdentityHashMap<>());
@@ -32,8 +30,12 @@ public class LogSanitizer {
         } else if (valueForMasking instanceof Collection<?> c) {
             return c.stream().map(v -> mask(v, visited)).toList();
         } else if (valueForMasking.getClass().isArray()) {
-            Object[] arr = (Object[])valueForMasking;
-            return Arrays.stream(arr).map(v -> mask(v, visited)).toArray();
+            int len = Array.getLength(valueForMasking);
+            Object[] masked = new Object[len];
+            for (int i = 0; i < len; i++) {
+                masked[i] = mask(Array.get(valueForMasking, i), visited);
+            }
+            return masked;
         }
 
         Class<?> type = valueForMasking.getClass();

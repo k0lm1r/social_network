@@ -34,9 +34,20 @@ management:
         include:
         - health
         - info
-        - metrics  
+        - metrics
+        - prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   app:
     name: API Gateway
     description: Single entrypoint
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.api_gateway.service..*(..)"
+    exclude: []

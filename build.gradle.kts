@@ -33,7 +33,7 @@ subprojects {
     if (name != "proto") {
         apply(plugin = "io.freefair.lombok")
 
-        if (name != "logging-common" && name != "auth-contract") {
+        if (name != "auth-contract") {
             apply(plugin = "org.springframework.boot")
             apply(plugin = "io.spring.dependency-management")
 

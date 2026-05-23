@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Boolean isCurrentUserOwner(Long commentId) {
-        return commentRepository.existsByIdAndAuthorId(currentUserProvider.getCurrentUserId(), commentId);
+        return commentRepository.existsByIdAndAuthorId(commentId, currentUserProvider.getCurrentUserId());
     }
 
     private Comment findById(Long commentId) {

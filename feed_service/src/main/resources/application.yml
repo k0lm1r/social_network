@@ -3,6 +3,7 @@ spring:
     enabled: true
     change-log: classpath:db/migrations/db.changelog-master.yml
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: none
   application:
@@ -39,8 +40,19 @@ management:
         - health
         - info
         - metrics
+        - prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   app:
     name: Feed service
     description: Post management and comment creating service
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.feed_service.service..*(..)"
+    exclude: []

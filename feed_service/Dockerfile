@@ -4,14 +4,14 @@ WORKDIR /app
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY feed_service/build.gradle.kts feed_service/build.gradle.kts
-COPY logging-common/build.gradle.kts logging-common/build.gradle.kts
+COPY common/logging-common/build.gradle.kts common/logging-common/build.gradle.kts
 COPY common/auth-contract/build.gradle.kts common/auth-contract/build.gradle.kts
 COPY common/auth-spring-security/build.gradle.kts common/auth-spring-security/build.gradle.kts
 
 RUN gradle :feed_service:dependencies --no-daemon || true
 
 COPY feed_service feed_service
-COPY logging-common logging-common
+COPY common/logging-common common/logging-common
 COPY common/auth-contract common/auth-contract
 COPY common/auth-spring-security common/auth-spring-security
 

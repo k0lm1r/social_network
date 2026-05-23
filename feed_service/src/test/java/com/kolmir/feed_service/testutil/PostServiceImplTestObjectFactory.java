@@ -18,7 +18,7 @@ public class PostServiceImplTestObjectFactory {
 
     public static Post post(Long id, Long authorId, String text, Double popularity) {
         LocalDateTime now = LocalDateTime.now();
-        return new Post(id, authorId, text, now, popularity, now, List.of());
+        return new Post(id, authorId, text, popularity, now, now, List.of());
     }
 
     public static PostResponse response(Post post) {

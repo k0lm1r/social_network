@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -30,12 +29,7 @@ import lombok.ToString;
 public class Post {
     @Id
     @EqualsAndHashCode.Exclude
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_sequence")
-    @SequenceGenerator (
-        name = "post_sequence",
-        sequenceName = "post_sequence",
-        allocationSize = 50
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "author_id")
@@ -43,10 +37,10 @@ public class Post {
 
     private String text;
 
+    private Double popularity;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
-    private Double popularity;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
