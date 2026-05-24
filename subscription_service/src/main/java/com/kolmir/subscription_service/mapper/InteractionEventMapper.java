@@ -10,6 +10,7 @@ import com.kolmir.subscription_service.dto.event.InteractionEventResponse;
 import com.kolmir.subscription_service.dto.event.LikeDislikeResponse;
 import com.kolmir.subscription_service.dto.event.SubscriptionResponse;
 import com.kolmir.subscription_service.model.InteractionEvent;
+import com.kolmir.subscription_service.model.SubscriptionLink;
 
 @Mapper (
     componentModel = "spring",
@@ -24,5 +25,13 @@ public interface InteractionEventMapper {
             case SUBSCRIBE, UNSUBSCRIBE -> new SubscriptionResponse(event.getId(), event.getAction(), event.getUserId(), event.getTargetUserId());
             case LIKE, DISLIKE -> new LikeDislikeResponse(event.getId(), event.getAction(), event.getUserId(), event.getPostId());
         };
+    }
+
+    public default CreateInteractionEventRequest toInteractionEventRequest(SubscriptionLink link, String action) {
+        return new CreateInteractionEventRequest(
+            action, 
+            link.getFollowerId(), 
+            link.getFollowingId(), 
+        null);
     }
 }

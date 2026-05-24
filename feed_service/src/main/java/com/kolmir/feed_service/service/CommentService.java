@@ -9,7 +9,7 @@ import com.kolmir.feed_service.dto.comment.*;
 
 public interface CommentService {
     public Page<CommentResponse> getAllCommentsForPost(Long postId, Pageable pageable);
-    public Long getCommentsCountForPost(Long postId);
+    public CommentsCountResponse getCommentsCountForPost(Long postId);
     public Page<CommentResponse> getAllFromUserToPost(Long userId, Long postId, Pageable pageable);
     public CommentResponse getById(Long commentId);
     public CommentResponse create(CommentCreateRequest request);

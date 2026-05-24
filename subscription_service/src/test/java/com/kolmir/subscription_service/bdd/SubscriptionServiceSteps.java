@@ -28,7 +28,6 @@ import com.kolmir.subscription_service.mapper.InteractionEventMapper;
 import com.kolmir.subscription_service.mapper.ReactionMapper;
 import com.kolmir.subscription_service.mapper.SubscriptionLinkMapper;
 import com.kolmir.subscription_service.model.Action;
-import com.kolmir.subscription_service.model.InteractionEvent;
 import com.kolmir.subscription_service.model.Reaction;
 import com.kolmir.subscription_service.model.SubscriptionLink;
 import com.kolmir.subscription_service.openfeign.PostClient;
@@ -57,18 +56,21 @@ import io.cucumber.java.en.When;
 public class SubscriptionServiceSteps {
     private final SubscriptionLinkRepository subscriptionRepository = Mockito.mock(SubscriptionLinkRepository.class);
     private final SubscriptionLinkMapper subscriptionMapper = Mockito.mock(SubscriptionLinkMapper.class);
+    private final InteractionEventMapper interactionEventMapper = Mockito.mock(InteractionEventMapper.class);
+    private final InteractionEventService interactionEventService = Mockito.mock(InteractionEventService.class);
     private final UserExistenceService userExistenceService = Mockito.mock(UserExistenceService.class);
     private final CurrentUserProvider currentUserProvider = Mockito.mock(CurrentUserProvider.class);
     private final SubscriptionLinkServiceImpl subscriptionService = new SubscriptionLinkServiceImpl(
         subscriptionRepository,
         subscriptionMapper,
+        interactionEventMapper,
+        interactionEventService,
         userExistenceService,
         currentUserProvider
     );
 
     private final ReactionRepository reactionRepository = Mockito.mock(ReactionRepository.class);
     private final ReactionMapper reactionMapper = Mockito.mock(ReactionMapper.class);
-    private final InteractionEventService interactionEventService = Mockito.mock(InteractionEventService.class);
     private final PostService postService = Mockito.mock(PostService.class);
     private final ReactionServiceImpl reactionService = new ReactionServiceImpl(
         reactionRepository,
@@ -79,7 +81,6 @@ public class SubscriptionServiceSteps {
     );
 
     private final InteractionEventRepository interactionEventRepository = Mockito.mock(InteractionEventRepository.class);
-    private final InteractionEventMapper interactionEventMapper = Mockito.mock(InteractionEventMapper.class);
     private final UserExistenceService interactionUserExistenceService = Mockito.mock(UserExistenceService.class);
     private final InteractionEventServiceImpl interactionEventServiceImpl = new InteractionEventServiceImpl(
         interactionEventRepository,
@@ -246,8 +247,12 @@ public class SubscriptionServiceSteps {
 
     @Given("the user already has dislike reaction for main post")
     public void theUserAlreadyHasDislikeReactionForMainPost() {
-        when(interactionEventService.userHasReaction(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID)).thenReturn(true);
-        when(interactionEventService.getReacitonFromUser(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID))
+        when(interactionEventService.userHasReaction(
+            SubscriptionBddTestConstants.USER_ID,
+            SubscriptionBddTestConstants.POST_ID,
+            Action.LIKE.name()
+        )).thenReturn(true);
+        when(interactionEventService.getReactionFromUser(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID))
             .thenReturn(SubscriptionBddObjectFactory.likeDislikeResponse(
                 SubscriptionBddTestConstants.EVENT_ID,
                 Action.DISLIKE,
@@ -258,7 +263,7 @@ public class SubscriptionServiceSteps {
 
     @Given("the user already has like reaction for main post")
     public void theUserAlreadyHasLikeReactionForMainPost() {
-        when(interactionEventService.getReacitonFromUser(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID))
+        when(interactionEventService.getReactionFromUser(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID))
             .thenReturn(SubscriptionBddObjectFactory.likeDislikeResponse(
                 SubscriptionBddTestConstants.EVENT_ID,
                 Action.LIKE,
@@ -326,7 +331,11 @@ public class SubscriptionServiceSteps {
 
     @Given("interaction event for like already exists")
     public void interactionEventForLikeAlreadyExists() {
-        when(interactionEventRepository.existsByUserIdAndPostId(SubscriptionBddTestConstants.USER_ID, SubscriptionBddTestConstants.POST_ID))
+        when(interactionEventRepository.existsByUserIdAndPostIdAndAction(
+            SubscriptionBddTestConstants.USER_ID,
+            SubscriptionBddTestConstants.POST_ID,
+            Action.LIKE.name()
+        ))
             .thenReturn(true);
         Mockito.doNothing().when(interactionUserExistenceService).validateUserExists(SubscriptionBddTestConstants.USER_ID);
     }

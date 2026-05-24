@@ -55,11 +55,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Cacheable(cacheNames = FEEDS_CACHE, keyGenerator = "pageKeyGenerator")
-    public Page<PostResponse> getFeedForUser(Long userId, int pageNumber, int pageSize) {
-        return postRepository.findByAuthorIdIn(
-            followingAndReactionsService.getFollowingsIdsForUser(userId), 
-            withSortByPopularity(pageNumber, pageSize)
-        ).map(postMapper::toResponse);
+    public Page<PostResponse> getFeedForUser(int pageNumber, int pageSize) {
+        var userId = currentUserProvider.getCurrentUserId();
+        var followingsIds = followingAndReactionsService.getFollowingsIdsForUser(userId);
+        var pageable = withSortByPopularity(pageNumber, pageSize);
+
+        if (followingsIds.isEmpty())
+            return getAll(pageable);
+
+        return postRepository.findByAuthorIdIn(followingsIds, pageable).map(postMapper::toResponse);
     }
 
     @Override
@@ -114,7 +118,7 @@ public class PostServiceImpl implements PostService {
         post.setPopularity(calcPopularity(
             reactions.likeCount(), 
             reactions.dislikeCount(), 
-            commentService.getCommentsCountForPost(postId)
+            commentService.getCommentsCountForPost(postId).count()
         ));
 
         postMapper.toResponse(postRepository.save(post));

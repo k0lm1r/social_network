@@ -15,11 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.mockito.Mockito;
 
 import com.kolmir.security.provider.CurrentUserProvider;
@@ -31,6 +26,7 @@ import com.kolmir.subscription_service.repository.ReactionRepository;
 import com.kolmir.subscription_service.repository.SubscriptionLinkRepository;
 import com.kolmir.subscription_service.service.ReactionService;
 import com.kolmir.subscription_service.service.SubscriptionLinkService;
+import com.kolmir.subscription_service.testutil.integration.SubscriptionTestContainers;
 
 @SpringBootTest(
     properties = {
@@ -38,17 +34,7 @@ import com.kolmir.subscription_service.service.SubscriptionLinkService;
         "spring.cloud.discovery.enabled=false"
     }
 )
-@Testcontainers
-class SubscriptionServiceIntegrationTest {
-
-    @Container
-    static final MongoDBContainer mongo = new MongoDBContainer(MONGO_IMAGE);
-
-    @DynamicPropertySource
-    static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.mongodb.uri", mongo::getReplicaSetUrl);
-    }
-
+class SubscriptionServiceIntegrationTest extends SubscriptionTestContainers {
     @Autowired
     private SubscriptionLinkService subscriptionLinkService;
 

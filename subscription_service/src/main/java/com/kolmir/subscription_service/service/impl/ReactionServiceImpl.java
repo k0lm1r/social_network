@@ -40,7 +40,7 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public ReactionResponse addReaction(AddReactionRequest request, Long postId) {
         Long currentUserId = currentUserProvider.getCurrentUserId();
-        if (interactionEventService.userHasReaction(currentUserId, postId))
+        if (interactionEventService.userHasReaction(currentUserId, postId, request.action()))
             deleteReaction(postId);
         
         interactionEventService.save(mapper.toCreateEventRequest(request, postId, currentUserId));
@@ -50,7 +50,7 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public ReactionResponse deleteReaction(Long postId) {
         LikeDislikeResponse event = (LikeDislikeResponse)interactionEventService
-            .getReacitonFromUser(currentUserProvider.getCurrentUserId(), postId);
+            .getReactionFromUser(currentUserProvider.getCurrentUserId(), postId);
         interactionEventService.delete(event.id());
         return changeReactionsCount(postId, event.action(), -1);
     }

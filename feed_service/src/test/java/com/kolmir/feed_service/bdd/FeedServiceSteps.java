@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 
 import com.kolmir.feed_service.dto.post.PostRequest;
 import com.kolmir.feed_service.dto.post.PostResponse;
+import com.kolmir.feed_service.dto.comment.CommentsCountResponse;
 import com.kolmir.feed_service.exception.NotFoundException;
 import com.kolmir.feed_service.mapper.CommentMapper;
 import com.kolmir.feed_service.mapper.PostMapper;
@@ -64,6 +65,7 @@ public class FeedServiceSteps {
     private final CommentServiceImpl commentServiceImpl = new CommentServiceImpl(
         commentMapper,
         commentRepository,
+        postRepository,
         currentUserProvider
     );
 
@@ -103,7 +105,6 @@ public class FeedServiceSteps {
     @When("the user requests their feed")
     public void theUserRequestsTheirFeed() {
         feedPage = postService.getFeedForUser(
-            FeedBddTestConstants.USER_ID,
             FeedBddTestConstants.PAGE_NUMBER,
             FeedBddTestConstants.PAGE_SIZE
         );
@@ -138,7 +139,8 @@ public class FeedServiceSteps {
                 FeedBddTestConstants.LIKES,
                 FeedBddTestConstants.DISLIKES
             ));
-        when(commentService.getCommentsCountForPost(FeedBddTestConstants.POST_ID)).thenReturn(FeedBddTestConstants.COMMENTS);
+        when(commentService.getCommentsCountForPost(FeedBddTestConstants.POST_ID))
+            .thenReturn(new CommentsCountResponse(FeedBddTestConstants.COMMENTS));
     }
 
     @When("post popularity is recalculated")

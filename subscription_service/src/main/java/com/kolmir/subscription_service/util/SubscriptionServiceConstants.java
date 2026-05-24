@@ -21,6 +21,7 @@ public class SubscriptionServiceConstants {
     public static final String USER_ID_WAS_NOT_VALIDATED_EXCEPTION = "The user ID was not verified due to lack of access to the external service";
     public static final String FEED_POST_URL = "/api/posts";
     public static final String FEED_POST_ID_URL = FEED_POST_URL + "/{postId}";
-    public static final String FEED_POPULARITY_URL = FEED_POST_URL + "/popularity";
+    public static final String FEED_POST_EXISTING_URL = FEED_POST_ID_URL + "/exists";
+    public static final String FEED_POPULARITY_URL = FEED_POST_ID_URL+ "/popularity";
     public static final String POST_NOT_FOUND_MESSAGE = "Post with this id was not found";
 }

@@ -10,7 +10,10 @@ import com.kolmir.feed_service.exception.NotFoundException;
 import com.kolmir.feed_service.mapper.CommentMapper;
 import com.kolmir.feed_service.model.Comment;
 import com.kolmir.feed_service.repository.CommentRepository;
+import com.kolmir.feed_service.repository.PostRepository;
 import com.kolmir.feed_service.service.CommentService;
+import com.kolmir.feed_service.util.PostUtil;
+
 import static com.kolmir.feed_service.util.CommentUtil.*;
 import com.kolmir.security.provider.CurrentUserProvider;
 
@@ -23,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final CurrentUserProvider currentUserProvider;
 
     @Override
@@ -47,14 +51,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponse create(CommentCreateRequest request) {
+        if (!postRepository.existsById(request.postId()))
+            throw new NotFoundException(PostUtil.NOT_FOUND_MESSAGE);
         Comment comment = commentMapper.toComment(request);
         comment.setAuthorId(currentUserProvider.getCurrentUserId());
         return commentMapper.toResponse(commentRepository.save(comment));
     }
 
     @Override
-    public Long getCommentsCountForPost(Long postId) {
-        return commentRepository.findCountByPostId(postId);
+    public CommentsCountResponse getCommentsCountForPost(Long postId) {
+        return commentMapper.toCommentsCountResponse(commentRepository.findCountByPostId(postId));
     }
 
     @Override

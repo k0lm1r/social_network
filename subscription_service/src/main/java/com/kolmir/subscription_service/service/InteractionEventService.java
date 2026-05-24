@@ -11,7 +11,7 @@ public interface InteractionEventService {
     public List<InteractionEventResponse> getAllByAction(String action);
     public InteractionEventResponse save(CreateInteractionEventRequest request);
     public InteractionEventResponse getEventById(String id);
-    public InteractionEventResponse getReacitonFromUser(Long userId, Long postId);
-    public boolean userHasReaction(Long userId, Long postId);
+    public InteractionEventResponse getReactionFromUser(Long userId, Long postId);
+    public boolean userHasReaction(Long userId, Long postId, String action);
     public void delete(String id);
 }

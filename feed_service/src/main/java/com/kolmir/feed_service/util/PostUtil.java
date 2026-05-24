@@ -18,5 +18,5 @@ public class PostUtil {
     public static final String POPULARITY_URL = POST_ID_URL + "/popularity";
     public static final String EXISTING_URL = POST_ID_URL + "/exists";
     public static final String FROM_USER_URL = "/user/{userId}";
-    public static final String FEED_URL = FROM_USER_URL + "/feed";
+    public static final String FEED_URL = "/feed";
 }

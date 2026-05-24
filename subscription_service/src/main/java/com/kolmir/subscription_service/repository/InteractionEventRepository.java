@@ -12,7 +12,7 @@ import com.kolmir.subscription_service.model.InteractionEvent;
 @Repository
 public interface InteractionEventRepository extends MongoRepository<InteractionEvent, String> {
     public List<InteractionEvent> findByAction(String action);
-    public boolean existsByUserIdAndTargetUserId(Long userId, Long targetUserId);
-    public boolean existsByUserIdAndPostId(Long userId, Long postId);
+    public boolean existsByUserIdAndTargetUserIdAndAction(Long userId, Long targetUserId, String action);
+    public boolean existsByUserIdAndPostIdAndAction(Long userId, Long postId, String action);
     public Optional<InteractionEvent> findByPostIdAndUserId(Long postId, Long userId);
 }

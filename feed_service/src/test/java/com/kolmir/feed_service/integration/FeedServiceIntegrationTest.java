@@ -15,53 +15,26 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.kolmir.feed_service.openfeign.service.FollowingAndReactionsService;
 import com.kolmir.feed_service.repository.CommentRepository;
 import com.kolmir.feed_service.repository.PostRepository;
 import com.kolmir.feed_service.service.PostService;
+import com.kolmir.feed_service.testutil.integration.FeedTestContainers;
 import com.kolmir.security.provider.CurrentUserProvider;
 
 import org.mockito.Mockito;
 
 
-@SuppressWarnings("resource")
 @SpringBootTest(
     properties = {
         "eureka.client.enabled=false",
         "spring.cloud.discovery.enabled=false",
         "spring.liquibase.enabled=true",
-        "spring.cache.type=redis"
+        "spring.cache.type=redis",
     }
 )
-@Testcontainers
-class FeedServiceIntegrationTest {
-//TODO вынести в отдельный класс
-    @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(POSTGRES_IMAGE)
-        .withDatabaseName(FEED_TEST_DB)
-        .withUsername(DB_USERNAME)
-        .withPassword(DB_PASSWORD);
-
-    @Container
-    static final GenericContainer<?> redis = new GenericContainer<>(REDIS_IMAGE)
-        .withExposedPorts(6379);
-
-    @DynamicPropertySource
-    static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.data.redis.host", redis::getHost);
-        registry.add("spring.data.redis.port", redis::getFirstMappedPort);
-    }
-
+class FeedServiceIntegrationTest extends FeedTestContainers {
     @Autowired
     private PostService postService;
 
@@ -115,7 +88,6 @@ class FeedServiceIntegrationTest {
             .thenReturn(List.of(FOLLOWING_AUTHOR_ID));
 
         var page = postService.getFeedForUser(
-            CURRENT_USER_ID,
             PAGE_INDEX,
             PAGE_SIZE
         );

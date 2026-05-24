@@ -42,11 +42,10 @@ public class PostController {
 
     @GetMapping(FEED_URL)
     public ResponseEntity<Page<PostResponse>> getFeed(
-            @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
         ) {
-        return ResponseEntity.ok(postService.getFeedForUser(userId, page, size));
+        return ResponseEntity.ok(postService.getFeedForUser(page, size));
     }
 
     @GetMapping(POST_ID_URL)
