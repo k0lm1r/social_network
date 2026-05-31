@@ -65,7 +65,7 @@ public class InteractionEventServiceImpl implements InteractionEventService {
 
     @Override
     @Transactional(readOnly = true)
-    public InteractionEventResponse getReacitonFromUser(Long userId, Long postId) {
+    public InteractionEventResponse getReactionFromUser(Long userId, Long postId) {
         InteractionEvent event = repository.findByPostIdAndUserId(postId, userId).orElseThrow(
             () -> new NotFoundException(EVENT_NOT_FOUND_MESSAGE)
         );
@@ -74,18 +74,26 @@ public class InteractionEventServiceImpl implements InteractionEventService {
     
     @Override
     @Transactional(readOnly = true)
-    public boolean userHasReaction(Long userId, Long postId) {
-        return repository.existsByUserIdAndPostId(userId, postId);
+    public boolean userHasReaction(Long userId, Long postId, String action) {
+        return repository.existsByUserIdAndPostIdAndAction(userId, postId, action);
     }
 
-    private boolean isUserSubscriber (Long userId, Long targetUserId) {
-        return repository.existsByUserIdAndTargetUserId(userId, targetUserId);
+    private boolean isUserSubscriber (Long userId, Long targetUserId, String action) {
+        return repository.existsByUserIdAndTargetUserIdAndAction(userId, targetUserId, action);
     }
 
     private boolean isEventNotUnique(CreateInteractionEventRequest request) {
         return switch(Action.valueOf(request.action())) {
-            case LIKE, DISLIKE -> userHasReaction(request.userId(), request.postId());
-            case SUBSCRIBE, UNSUBSCRIBE -> isUserSubscriber(request.userId(), request.targetUserId());
+            case LIKE, DISLIKE -> userHasReaction(
+                request.userId(), 
+                request.postId(), 
+                request.action()
+            );
+            case SUBSCRIBE, UNSUBSCRIBE -> isUserSubscriber(
+                request.userId(), 
+                request.targetUserId(), 
+                request.action()
+            );
         };
     }
 }

@@ -55,11 +55,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Cacheable(cacheNames = FEEDS_CACHE, keyGenerator = "pageKeyGenerator")
-    public Page<PostResponse> getFeedForUser(Long userId, Pageable pageable) {
-        return postRepository.findByAuthorIdIn(
-            followingAndReactionsService.getFollowingsIdsForUser(userId), 
-            withSortByPopularity(pageable)
-        ).map(postMapper::toResponse);
+    public Page<PostResponse> getFeedForUser(int pageNumber, int pageSize) {
+        var userId = currentUserProvider.getCurrentUserId();
+        var followingsIds = followingAndReactionsService.getFollowingsIdsForUser(userId);
+        var pageable = withSortByPopularity(pageNumber, pageSize);
+
+        if (followingsIds.isEmpty())
+            return getAll(pageable);
+
+        return postRepository.findByAuthorIdIn(followingsIds, pageable).map(postMapper::toResponse);
     }
 
     @Override
@@ -70,17 +74,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true)
+    @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true)
     public PostResponse create(PostRequest request) {
         Post post = postMapper.toPost(request);
         post.setAuthorId(currentUserProvider.getCurrentUserId());
+        post.setPopularity(Double.valueOf(0));
         return postMapper.toResponse(postRepository.save(post));
     }
 
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#id")
     })    
     public PostResponse update(Long id, PostRequest request) {
@@ -93,7 +98,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#id")
     })
     public void delete(Long id) {
@@ -101,8 +106,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     @Caching(evict = {
-        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USERS_CACHE}, allEntries = true),
+        @CacheEvict(cacheNames = {FEEDS_CACHE, ALL_POSTS_CACHE, ALL_FROM_USER_CACHE}, allEntries = true),
         @CacheEvict(cacheNames = POST_CACHE, key = "#postId")
     })
     public void updatePopularity(Long postId) {
@@ -112,7 +118,7 @@ public class PostServiceImpl implements PostService {
         post.setPopularity(calcPopularity(
             reactions.likeCount(), 
             reactions.dislikeCount(), 
-            commentService.getCommentsCountForPost(postId)
+            commentService.getCommentsCountForPost(postId).count()
         ));
 
         postMapper.toResponse(postRepository.save(post));
@@ -128,14 +134,14 @@ public class PostServiceImpl implements PostService {
         return postRepository.existsByIdAndAuthorId(postId, currentUserProvider.getCurrentUserId());
     }
 
-    private Pageable withSortByPopularity(Pageable pageable) {
+    public Pageable withSortByPopularity(int pageNumber, int pageSize) {
         Sort sortByPopularity = Sort.by(
             Sort.Order.desc(CREATED_AT_FIELD),
             Sort.Order.desc(POPULARITY_FIELD_NAME)
         );
         return PageRequest.of(
-            pageable.getPageNumber(),
-            pageable.getPageSize(),
+            pageNumber,
+            pageSize,
             sortByPopularity
         );
     }
@@ -146,7 +152,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
-    private Double calcPopularity(Integer likesCount, Integer dislikesCount, Integer commentsCount) {
+    private Double calcPopularity(Integer likesCount, Integer dislikesCount, Long commentsCount) {
         return likesCount * 1.5 - dislikesCount + commentsCount * 2;
     }
 }

@@ -17,6 +17,13 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+
+	testImplementation("io.cucumber:cucumber-java:7.20.1")
+	testImplementation("io.cucumber:cucumber-junit-platform-engine:7.20.1")
+	testImplementation("org.junit.platform:junit-platform-suite")
+	testImplementation("org.glassfish.jersey.core:jersey-common:3.1.8")
+	testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+	testImplementation("org.testcontainers:mongodb:1.21.3")
 }
 
 jacoco {

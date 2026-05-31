@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kolmir.feed_service.dto.comment.CommentCreateRequest;
 import com.kolmir.feed_service.dto.comment.CommentResponse;
+import com.kolmir.feed_service.dto.comment.CommentsCountResponse;
 import com.kolmir.feed_service.service.CommentService;
 import static com.kolmir.feed_service.util.CommentUtil.*;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class CommentController {
     }
 
     @GetMapping(COMMENTS_COUNT_FOR_POST)
-    public ResponseEntity<Integer> getCountForPost(@PathVariable Long postId) {
+    public ResponseEntity<CommentsCountResponse> getCountForPost(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getCommentsCountForPost(postId));
     }
 

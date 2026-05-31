@@ -23,6 +23,10 @@ public abstract class CommentMapper {
     protected EntityManager entityManager;
 
     public abstract Comment toComment(CommentCreateRequest request);
+
+    public CommentsCountResponse toCommentsCountResponse(Long count) {
+        return new CommentsCountResponse(count);
+    }
     
     @Mapping(target = "postId", source = "post.id")
     public abstract CommentResponse toResponse(Comment comment);

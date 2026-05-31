@@ -10,7 +10,7 @@ import static com.kolmir.subscription_service.util.SubscriptionServiceConstants.
 
 @FeignClient(name = "feed-service")
 public interface PostClient {
-    @GetMapping(FEED_POST_ID_URL)
+    @GetMapping(FEED_POST_EXISTING_URL)
     public Boolean isPostExists(@PathVariable Long postId);
 
     @PutMapping(FEED_POPULARITY_URL)

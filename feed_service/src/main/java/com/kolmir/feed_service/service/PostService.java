@@ -10,7 +10,7 @@ import com.kolmir.feed_service.dto.post.PostResponse;
 public interface PostService {
     public Page<PostResponse> getAll(Pageable pageable);
     public Page<PostResponse> getAllFromUser(Long userId, Pageable pageable);
-    public Page<PostResponse> getFeedForUser(Long userId, Pageable pageable);
+    public Page<PostResponse> getFeedForUser(int pageNumber, int pageSize);
     public PostResponse getById(Long id);
     public PostResponse create(PostRequest request);
     public void updatePopularity(Long postId);

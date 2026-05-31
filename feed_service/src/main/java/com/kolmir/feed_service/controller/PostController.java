@@ -1,6 +1,7 @@
 package com.kolmir.feed_service.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kolmir.feed_service.dto.post.PostRequest;
@@ -40,8 +41,11 @@ public class PostController {
     }
 
     @GetMapping(FEED_URL)
-    public ResponseEntity<Page<PostResponse>> getFeed(@PathVariable Long userId, Pageable pageable) {
-        return ResponseEntity.ok(postService.getFeedForUser(userId, pageable));
+    public ResponseEntity<Page<PostResponse>> getFeed(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+        ) {
+        return ResponseEntity.ok(postService.getFeedForUser(page, size));
     }
 
     @GetMapping(POST_ID_URL)
