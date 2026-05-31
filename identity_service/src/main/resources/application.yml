@@ -48,9 +48,26 @@ management:
         include:
         - health
         - info
-        - metrics  
+        - metrics
+        - prometheus
+  metrics:
+    tags:
+      service: ${spring.application.name}
+    distribution.percentiles-histogram:
+      "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   app:
     name: Identity service
     description: Authentication and authorize service
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.identity_service.service..*(..)"
+    exclude:
+    - "* com.kolmir.identity_service.service.impl.UserAuthProviderImpl.*(..)"

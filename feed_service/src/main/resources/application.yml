@@ -1,0 +1,63 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/migrations/db.changelog-master.yml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  application:
+    name: feed-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${POSTGRES_DB:modsen_social_db}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
+
+server:
+  port: 8084
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - metrics
+        - prometheus
+  metrics:
+    tags:
+      service: ${spring.application.name}
+    distribution.percentiles-histogram:
+      "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+info:
+  app:
+    name: Feed service
+    description: Post management and comment creating service
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.feed_service.service..*(..)"
+    exclude: []

@@ -1,6 +1,7 @@
 package com.kolmir.identity_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
@@ -10,11 +11,12 @@ import com.kolmir.identity_service.dto.user.UserUpdateRequest;
 
 
 public interface UserService {
-    public List<UserResponse> getAll();
+    public Page<UserResponse> getAll(Pageable pageable);
     public UserResponse getById(Long id);
     public UserResponse saveRegisteredUser(UserRegisterRequest request);
     public UserResponse update(Long id, UserUpdateRequest request);
     public UserResponse disable(Long id);
     public UserResponse changeRole(Long id, UserChangeRoleRequest request);
     public UserResponse saveCreatedUser(UserCreateRequest request);
+    public Boolean isUserExists(Long id);
 }

@@ -22,11 +22,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.dto.auth.UserRegisterRequest;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import static com.kolmir.identity_service.util.KeycloakConstants.*;
 

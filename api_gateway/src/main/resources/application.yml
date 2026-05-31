@@ -34,9 +34,25 @@ management:
         include:
         - health
         - info
-        - metrics  
+        - metrics
+        - prometheus
+  metrics:
+    tags:
+      service: ${spring.application.name}
+    distribution.percentiles-histogram:
+      "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   app:
     name: API Gateway
     description: Single entrypoint
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.api_gateway.service..*(..)"
+    exclude: []

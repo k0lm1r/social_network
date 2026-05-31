@@ -8,8 +8,24 @@ val modules = listOf("identity_service",
                     "proto",
                     "eureka_server",
                     "api_gateway",
-                    "logging-common")
+                    "subscription_service",
+                    "feed_service")
 
 modules
     .filter { file(it).isDirectory }
     .forEach { include(":$it") }
+
+if (file("common/auth-contract").isDirectory) {
+    include(":auth-contract")
+    project(":auth-contract").projectDir = file("common/auth-contract")
+}
+
+if (file("common/logging-common").isDirectory) {
+    include(":logging-common")
+    project(":logging-common").projectDir = file("common/logging-common")
+}
+
+if (file("common/auth-spring-security").isDirectory) {
+    include(":auth-spring-security")
+    project(":auth-spring-security").projectDir = file("common/auth-spring-security")
+}

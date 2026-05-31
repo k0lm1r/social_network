@@ -14,8 +14,8 @@ import static com.kolmir.identity_service.util.UserUtils.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +35,8 @@ public class UserController implements UserControllerApi {
     
     @Override
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<Page<UserResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
     
     @Override
@@ -67,8 +67,14 @@ public class UserController implements UserControllerApi {
 
     @Override
     @PatchMapping(CHANGE_ROLE_URL)
-    @PreAuthorize("!@securityServiceImpl.isCurrentUserOwner(#id) && hasRole('MAIN_ADMIN')")
+    @PreAuthorize("!@securityServiceImpl.isCurrentUserOwner(#id)")
     public ResponseEntity<UserResponse> changeRole(@PathVariable Long id, @RequestBody @Valid UserChangeRoleRequest request) {
         return ResponseEntity.ok(userService.changeRole(id, request));
     }
+
+    @GetMapping(IS_USER_EXISTS_URL)
+    public Boolean isUserExists(@PathVariable Long id) {
+        return userService.isUserExists(id);
+    }
+    
 }

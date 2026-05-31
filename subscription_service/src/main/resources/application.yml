@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: subscription-service
+  mongodb:
+    uri: mongodb://${SUBSCRIPTION_USERNAME}:${SUBSCRIPTION_PASSWORD}@${SUBSCRIPTION_HOST:localhost}:${SUBSCRIPTION_PORT:27017}/${SUBSCRIPTION_DBNAME:subscription_db}?authSource=admin
+  data.mongodb:
+    auto-index-creation: true
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - metrics
+        - prometheus
+  metrics:
+    tags:
+      service: ${spring.application.name}
+    distribution.percentiles-histogram:
+      "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+info:
+  app:
+    name: Subscription service
+    description: Social interaction processing service
+
+logging:
+  aspect:
+    include:
+    - "* com.kolmir.subscription_service.service..*(..)"
+    exclude: []

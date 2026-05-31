@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.auth.UserAuthRequest;
@@ -20,7 +21,6 @@ import com.kolmir.identity_service.service.SecurityService;
 import com.kolmir.identity_service.service.UserService;
 import com.kolmir.identity_service.service.UserAuthProvider;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service

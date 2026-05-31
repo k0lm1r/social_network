@@ -8,6 +8,7 @@ public class UserUtils {
     public static final String USER_ID_URL = "/{id}";
     public static final String USER_DISABLE_URL = "/disable" + USER_ID_URL;
     public static final String CHANGE_ROLE_URL = "/change-role" + USER_ID_URL;
+    public static final String IS_USER_EXISTS_URL = USER_ID_URL + "/exists";
     public static final String USER_ID_NOT_FOUND = "User with this id was not found";
     public static final String USER_DISABLING_MESSAGE = "You can't disable yourself";
     public static final String NO_PERMISIONS_EXCEPTION_MESSAGE = "No permision to set this role";

@@ -12,8 +12,14 @@ public class GatewayRoutesConfig {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("identity-service-route", r -> r
-                        .path("/api/auth/**", "/api/users/**")
-                        .uri("lb://identity-service"))
-                .build();
+                    .path("/api/auth/**", "/api/users/**")
+                    .uri("lb://identity-service"))
+                .route("subscription-service-route", r -> r
+                    .path("/api/events/**", "/api/subscriptions/**", "/api/reactions/**")
+                    .uri("lb://subscription-service"))
+                .route("feed-service-route", r -> r
+                    .path("/api/comments/**", "/api/posts/**")
+                    .uri("lb://feed-service")
+                ).build();
     }
 }

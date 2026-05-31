@@ -37,6 +37,10 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,13 +50,13 @@ import com.kolmir.identity_service.dto.user.UserChangeRoleRequest;
 import com.kolmir.identity_service.dto.user.UserCreateRequest;
 import com.kolmir.identity_service.dto.user.UserResponse;
 import com.kolmir.identity_service.dto.user.UserUpdateRequest;
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.exception.AlreadyExistsException;
 import com.kolmir.identity_service.exception.CreatingException;
 import com.kolmir.identity_service.exception.NotFoundException;
 import com.kolmir.identity_service.exception.UpdatingException;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.util.UserUtils;
@@ -76,15 +80,18 @@ class UserServiceImplTest {
     void getAll_shouldReturnMappedUsers() {
         User user = user(USER_ID_1, KEYCLOAK_ID, EMAIL, USERNAME, DISPLAY_NAME, BIO, true);
         UserResponse mapped = userResponse(USER_ID_1, EMAIL, USERNAME, DISPLAY_NAME, BIO, UserRole.USER, true);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> usersPage = new PageImpl<>(List.of(user), pageable, 1);
 
-        when(userRepository.findAll()).thenReturn(List.of(user));
-        when(userMapper.toResponses(List.of(user))).thenReturn(List.of(mapped));
+        when(userRepository.findAll(pageable)).thenReturn(usersPage);
+        when(userMapper.toUserResponse(user)).thenReturn(mapped);
 
-        List<UserResponse> result = userService.getAll();
+        Page<UserResponse> result = userService.getAll(pageable);
 
-        assertThat(result).containsExactly(mapped);
-        verify(userRepository).findAll();
-        verify(userMapper).toResponses(List.of(user));
+        assertThat(result.getContent()).containsExactly(mapped);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(userRepository).findAll(pageable);
+        verify(userMapper).toUserResponse(user);
     }
 
     @Test

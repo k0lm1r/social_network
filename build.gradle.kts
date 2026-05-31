@@ -31,42 +31,45 @@ subprojects {
     }
 
     if (name != "proto") {
-        apply(plugin = "org.springframework.boot")
-        apply(plugin = "io.spring.dependency-management")
         apply(plugin = "io.freefair.lombok")
 
-        dependencyManagement {
-            imports {
-                mavenBom(
-                    "org.springframework.cloud:spring-cloud-dependencies:${rootProject.extra["springCloudVersion"]}"
-                )
+        if (name != "auth-contract") {
+            apply(plugin = "org.springframework.boot")
+            apply(plugin = "io.spring.dependency-management")
+
+            dependencyManagement {
+                imports {
+                    mavenBom(
+                        "org.springframework.cloud:spring-cloud-dependencies:${rootProject.extra["springCloudVersion"]}"
+                    )
+                }
+
+                imports {
+                    mavenBom("org.springframework.grpc:spring-grpc-dependencies:${property("springGrpcVersion")}")
+                }
             }
 
-            imports {
-                mavenBom("org.springframework.grpc:spring-grpc-dependencies:${property("springGrpcVersion")}")
+            configurations {
+                compileOnly {
+                    extendsFrom(configurations.annotationProcessor.get())
+                }
             }
-        }
 
-        configurations {
-            compileOnly {
-                extendsFrom(configurations.annotationProcessor.get())
+            dependencies {
+                implementation("org.springframework.boot:spring-boot-starter-validation")
+                implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+                implementation("org.mapstruct:mapstruct:$mapstructVersion")
+                annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+                annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+
+                testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+                testImplementation("org.springframework.boot:spring-boot-starter-test")
             }
-        }
 
-        dependencies {
-            implementation("org.springframework.boot:spring-boot-starter-validation")
-            implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-            implementation("org.mapstruct:mapstruct:$mapstructVersion")
-            annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
-            annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-
-	        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-            testImplementation("org.springframework.boot:spring-boot-starter-test")
-        }
-
-        tasks.withType<Test> {
-            useJUnitPlatform()
+            tasks.withType<Test> {
+                useJUnitPlatform()
+            }
         }
     }
 }

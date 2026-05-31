@@ -41,6 +41,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import com.kolmir.auth.model.UserRole;
 import com.kolmir.identity_service.dto.auth.RefreshTokenRequest;
 import com.kolmir.identity_service.dto.auth.UserAuthRequest;
 import com.kolmir.identity_service.dto.auth.UserAuthResponse;
@@ -50,7 +51,6 @@ import com.kolmir.identity_service.dto.user.UserResponse;
 import com.kolmir.identity_service.mapper.AuthMapper;
 import com.kolmir.identity_service.mapper.UserMapper;
 import com.kolmir.identity_service.model.User;
-import com.kolmir.identity_service.model.UserRole;
 import com.kolmir.identity_service.repository.UserRepository;
 import com.kolmir.identity_service.service.UserAuthProvider;
 import com.kolmir.identity_service.service.UserService;
